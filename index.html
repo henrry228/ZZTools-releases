@@ -1,0 +1,682 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ZZTools · 一按即得">
+<meta property="og:description" content="常驻托盘的效率工具。一个快捷键呼出菜单，数字键选工具，字母键选结果。支持 Windows 与 macOS。">
+<meta property="og:url" content="https://henrry228.github.io/ZZTools-releases/">
+<meta property="og:image" content="https://henrry228.github.io/ZZTools-releases/social-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<title>ZZTools · 一按即得</title>
+<meta name="description" content="ZZTools：常驻托盘的效率工具。一个快捷键呼出菜单，数字键选工具，字母键选结果，自动复制并输入。支持 Windows 与 macOS。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@600;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300..500,0,0&display=block">
+<style>
+/* Layout: one 1120px column; hero = copy left, live quick-menu right; keycaps are the recurring motif. */
+:root {
+  --blue: #2A55D6;
+  --blue-ink: #1F45BC;
+  --ink: #1B2130;
+  --mist: #5D6577;
+  --paper: #F5F6F8;
+  --card: #FFFFFF;
+  --line: #E1E4EA;
+  --cap-top: #FFFFFF;
+  --cap-skirt: #C9D0DC;
+  --cap-text: #1B2130;
+  --sel: #EAF0FF;
+  --on-blue: #FFFFFF;
+  --shadow: 0 1px 2px rgba(27,33,48,.06), 0 12px 40px rgba(27,33,48,.10);
+  --f-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --f-display: "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
+  --f-body: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Segoe UI", "Noto Sans SC", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --blue: #7D9CFF; --blue-ink: #A9BDFF; --ink: #E8EBF2; --mist: #9BA3B4; --paper: #11151F; --card: #1A1F2B;
+    --line: #2A3142; --cap-top: #2B3245; --cap-skirt: #0B0E15; --cap-text: #E8EBF2; --sel: #222C47; --on-blue: #0E1424;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 40px rgba(0,0,0,.45); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --blue: #7D9CFF; --blue-ink: #A9BDFF; --ink: #E8EBF2; --mist: #9BA3B4; --paper: #11151F; --card: #1A1F2B;
+  --line: #2A3142; --cap-top: #2B3245; --cap-skirt: #0B0E15; --cap-text: #E8EBF2; --sel: #222C47; --on-blue: #0E1424;
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 40px rgba(0,0,0,.45); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; animation: none !important; } }
+body { background: var(--paper); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; border-radius: 6px; }
+.ms { font-family: "Material Symbols Rounded"; font-weight: 400; font-style: normal; font-size: 20px; line-height: 1; display: inline-block; vertical-align: middle; letter-spacing: normal; text-transform: none; white-space: nowrap; font-feature-settings: "liga"; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+.mono { font-family: var(--f-mono); }
+.num { font-variant-numeric: tabular-nums; }
+
+/* keycap */
+.kc { display: inline-grid; place-items: center; min-width: 1.9em; height: 1.9em; padding: 0 .5em; font-family: var(--f-mono); font-weight: 500; font-size: .82em; line-height: 1; color: var(--cap-text);
+  background: var(--cap-top); border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 2px 0 var(--cap-skirt); vertical-align: middle; }
+.kc.lg { font-size: 22px; min-width: 2.3em; height: 2.3em; border-radius: 10px; box-shadow: 0 4px 0 var(--cap-skirt); font-weight: 700; }
+
+/* nav */
+header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: color-mix(in srgb, var(--paper) 88%, transparent); backdrop-filter: saturate(1.4) blur(10px); -webkit-backdrop-filter: saturate(1.4) blur(10px); border-bottom: 1px solid transparent; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--paper); }
+header.top.scrolled { border-bottom-color: var(--line); }
+.nav { display: flex; align-items: center; gap: 24px; height: 64px; }
+.brand { display: flex; align-items: center; gap: 10px; color: var(--ink); font-family: var(--f-mono); font-weight: 700; font-size: 18px; letter-spacing: -.01em; }
+.brand:hover { text-decoration: none; }
+.brand svg { width: 30px; height: 30px; flex: none; }
+.brand b { color: var(--blue); font-weight: 700; }
+.nav nav { display: flex; gap: 22px; margin-left: auto; align-items: center; font-size: 15px; }
+.nav nav a { color: var(--mist); }
+.nav nav a:hover { color: var(--ink); text-decoration: none; }
+.nav nav a.btn-sm { color: var(--on-blue); background: var(--blue); padding: 7px 14px; border-radius: 8px; font-weight: 600; }
+.nav nav a.btn-sm:hover { background: var(--blue-ink); color: var(--on-blue); }
+@media (max-width: 640px) { .nav nav a.hide-sm { display: none; } }
+
+/* hero */
+.hero { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: 56px; align-items: center; padding-block: 72px 88px; }
+@media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); padding-block: 40px 56px; gap: 40px; } }
+.eyebrow { font-family: var(--f-mono); font-size: 13px; color: var(--mist); letter-spacing: .04em; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.hero h1 { font-family: var(--f-display); font-weight: 900; font-size: clamp(48px, 7.4vw, 88px); line-height: 1.04; letter-spacing: -.01em; margin: 18px 0 20px; text-wrap: balance; }
+.hero h1 em { font-style: normal; color: var(--blue); }
+.lede { font-size: 18px; color: var(--mist); max-width: 34em; margin: 0 0 30px; }
+.lede .kc { font-size: 14px; }
+.cta { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.btn { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 22px; border-radius: 10px; font-weight: 600; font-size: 16px; border: 1px solid transparent; cursor: pointer; }
+.btn:hover { text-decoration: none; }
+.btn.primary { background: var(--blue); color: var(--on-blue); box-shadow: 0 3px 0 var(--blue-ink); }
+.btn.primary:hover { transform: translateY(1px); box-shadow: 0 2px 0 var(--blue-ink); }
+.btn.ghost { background: var(--card); color: var(--ink); border-color: var(--line); }
+.btn.ghost:hover { border-color: var(--mist); }
+.btn small { font-weight: 400; opacity: .8; font-size: 13px; }
+.meta { margin-top: 16px; font-size: 13px; color: var(--mist); font-family: var(--f-mono); }
+
+/* demo menu */
+.stage { position: relative; display: grid; justify-items: center; gap: 14px; }
+.menu { width: min(100%, 400px); background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; font-size: 14px; }
+.menu-head { display: flex; align-items: center; gap: 8px; padding: 11px 14px; border-bottom: 1px solid var(--line); color: var(--mist); font-size: 13px; }
+.menu-head svg { width: 18px; height: 18px; }
+.menu-head .crumb { color: var(--ink); font-weight: 600; }
+.menu-head .right { margin-left: auto; font-family: var(--f-mono); font-size: 12px; }
+.menu ul { list-style: none; margin: 0; padding: 6px; min-height: 342px; }
+.menu li button { width: 100%; display: flex; align-items: center; gap: 12px; padding: 7px 10px; border: 0; background: transparent; color: var(--ink); font: inherit; text-align: left; border-radius: 8px; cursor: pointer; min-height: 40px; }
+.menu li button:hover, .menu li button.on { background: var(--sel); }
+.menu li .kc { font-size: 12px; flex: none; }
+.menu li .lab { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.menu li .val { font-family: var(--f-mono); color: var(--mist); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%; }
+.menu li .ms { color: var(--mist); font-size: 19px; }
+.menu-foot { display: flex; gap: 14px; flex-wrap: wrap; padding: 9px 14px; border-top: 1px solid var(--line); color: var(--mist); font-size: 12px; }
+.menu-foot .kc { font-size: 11px; }
+.toast { min-height: 1.4em; font-size: 13px; color: var(--mist); font-family: var(--f-mono); }
+.hint { font-size: 13px; color: var(--mist); text-align: center; }
+
+/* stats */
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-block: 1px solid var(--line); }
+.stats > div { padding-block: 28px; padding-inline: 4px; display: grid; gap: 4px; }
+.stats > div + div { border-left: 1px solid var(--line); padding-left: 28px; }
+.stats strong { font-family: var(--f-mono); font-size: clamp(26px, 3.4vw, 36px); font-weight: 700; letter-spacing: -.02em; }
+.stats span { color: var(--mist); font-size: 14px; }
+@media (max-width: 640px) { .stats { grid-template-columns: minmax(0, 1fr); } .stats > div + div { border-left: 0; border-top: 1px solid var(--line); padding-left: 4px; } }
+
+section.block { padding-block: 96px 0; }
+.sec-head { display: grid; gap: 10px; margin-bottom: 40px; max-width: 40em; }
+.sec-head h2 { font-family: var(--f-display); font-weight: 900; font-size: clamp(30px, 4vw, 44px); line-height: 1.15; margin: 0; text-wrap: balance; }
+.sec-head p { margin: 0; color: var(--mist); font-size: 17px; }
+
+/* bento: 4 columns, spans chosen so every row is full at 4, 2 and 1 column */
+.bento { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 1000px) { .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .bento { grid-template-columns: minmax(0, 1fr); } .bento .wide { grid-column: auto; } }
+.b { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 22px; display: grid; grid-template-rows: auto auto 1fr; gap: 10px; min-width: 0; transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s, border-color .25s; }
+.b:hover { transform: translateY(-4px); box-shadow: var(--shadow); border-color: color-mix(in srgb, var(--blue) 40%, var(--line)); }
+.b:hover .b-top .kc { transform: translateY(2px); box-shadow: 0 0 0 var(--cap-skirt); }
+.b.wide { grid-column: span 2; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); grid-template-rows: auto 1fr; column-gap: 24px; }
+.b.wide .b-top, .b.wide p { grid-column: 1; }
+.b.wide .viz { grid-column: 2; grid-row: 1 / span 3; height: auto; min-height: 190px; }
+@media (max-width: 600px) { .b.wide { grid-template-columns: minmax(0, 1fr); } .b.wide .viz { grid-column: 1; grid-row: auto; } }
+.b-top { display: flex; align-items: center; gap: 10px; }
+.b-top .kc { transition: transform .15s, box-shadow .15s; }
+.b-top .ms { color: var(--blue); font-size: 22px; margin-left: auto; }
+.b h3 { margin: 0; font-size: 17px; }
+.b p { margin: 0; color: var(--mist); font-size: 14.5px; line-height: 1.6; }
+.b p code { font-family: var(--f-mono); font-size: 12.5px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; }
+.viz { align-self: end; height: 118px; background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; font-family: var(--f-mono); font-size: 13px; overflow: hidden; position: relative; display: grid; align-content: center; gap: 6px; }
+.viz .lbl { color: var(--mist); font-size: 11.5px; letter-spacing: .04em; }
+.viz .big { font-size: 22px; font-weight: 700; letter-spacing: .02em; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.viz .row { display: flex; justify-content: space-between; gap: 10px; white-space: nowrap; min-width: 0; }
+.viz .row span:last-child { color: var(--mist); overflow: hidden; text-overflow: ellipsis; }
+.caret::after { content: ""; display: inline-block; width: .55em; height: 1.05em; margin-left: 2px; background: var(--blue); vertical-align: -.15em; animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* totp */
+.otp { display: grid; gap: 4px; align-content: center; }
+.otp-row { display: grid; grid-template-columns: minmax(0, 1fr) auto 26px; align-items: center; gap: 14px; padding: 7px 4px; border-bottom: 1px dashed var(--line); }
+.otp-row:last-child { border-bottom: 0; }
+.otp-row .n { color: var(--mist); font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.otp-row .c { font-size: 21px; font-weight: 700; letter-spacing: .08em; font-variant-numeric: tabular-nums; }
+.otp-row .c.flip { animation: flip .45s cubic-bezier(.2,.8,.2,1); }
+@keyframes flip { 0% { transform: rotateX(90deg); opacity: 0; } 100% { transform: none; opacity: 1; } }
+.ring { width: 22px; height: 22px; transform: rotate(-90deg); }
+.ring circle { fill: none; stroke-width: 3; }
+.ring .bg { stroke: var(--line); }
+.ring .fg { stroke: var(--blue); stroke-linecap: round; transition: stroke-dashoffset .25s linear; }
+
+/* clipboard */
+.clip { display: grid; gap: 6px; align-content: start; }
+.clip div { background: var(--card); border: 1px solid var(--line); border-radius: 7px; padding: 5px 9px; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.clip div.new { animation: drop .5s cubic-bezier(.2,.8,.2,1); }
+@keyframes drop { from { transform: translateY(-120%); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* screenshot */
+.shot { background: color-mix(in srgb, var(--ink) 6%, var(--paper)); padding: 0; display: block; }
+.shot .win { position: absolute; inset: 16px 22px; background: var(--card); border-radius: 8px; border: 1px solid var(--line); padding: 14px; display: grid; gap: 8px; align-content: start; }
+.shot .win i { display: block; height: 8px; border-radius: 4px; background: var(--line); }
+.shot .dim { position: absolute; inset: 0; background: rgba(15,20,35,.35); animation: dimIn 6s infinite; }
+.shot .sel { position: absolute; left: 22%; top: 24%; width: 0; height: 0; border: 1.5px solid var(--blue); box-shadow: 0 0 0 9999px rgba(15,20,35,.38); animation: sel 6s cubic-bezier(.5,0,.2,1) infinite; }
+.shot .sel b { position: absolute; left: -1px; top: -24px; font: 500 11px var(--f-mono); color: #fff; background: var(--blue); padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
+.shot .bar { position: absolute; right: 12%; bottom: 10%; display: flex; gap: 4px; padding: 5px; background: var(--card); border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); animation: bar 6s infinite; }
+.shot .bar .kc { font-size: 10.5px; }
+@keyframes sel { 0%, 8% { width: 0; height: 0; opacity: 0; } 10% { opacity: 1; } 42%, 90% { width: 52%; height: 46%; opacity: 1; } 100% { width: 52%; height: 46%; opacity: 0; } }
+@keyframes bar { 0%, 44% { opacity: 0; transform: translateY(8px); } 52%, 90% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+
+/* qr */
+.qrbox { display: flex; align-items: center; gap: 14px; }
+.qrbox canvas { width: 88px; height: 88px; image-rendering: pixelated; flex: none; background: var(--card); border-radius: 6px; padding: 4px; border: 1px solid var(--line); }
+.qrbox span { color: var(--mist); font-size: 12px; overflow-wrap: anywhere; min-width: 0; }
+
+/* net bars */
+.bars { display: flex; align-items: end; gap: 4px; height: 38px; }
+.bars i { flex: 1; background: color-mix(in srgb, var(--blue) 55%, transparent); border-radius: 2px 2px 0 0; transition: height .6s cubic-bezier(.2,.8,.2,1); }
+
+/* hero motion */
+@keyframes up { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+@keyframes pop { 0% { opacity: 0; transform: translateY(14px) scale(.96); } 100% { opacity: 1; transform: none; } }
+@keyframes press { 0%, 100% { transform: none; box-shadow: 0 2px 0 var(--cap-skirt); } 40% { transform: translateY(2px); box-shadow: 0 0 0 var(--cap-skirt); background: var(--sel); } }
+@keyframes float { 0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); } 50% { transform: translateY(-12px) rotate(var(--r, 0deg)); } }
+.a1, .a2, .a3, .a4, .a5 { animation: up .7s cubic-bezier(.2,.8,.2,1) both; }
+.a2 { animation-delay: .08s; } .a3 { animation-delay: .16s; } .a4 { animation-delay: .24s; } .a5 { animation-delay: .32s; }
+.lede .kc { animation: press .35s ease both; }
+.lede .kc:nth-of-type(1) { animation-delay: .25s; } .lede .kc:nth-of-type(2) { animation-delay: .37s; } .lede .kc:nth-of-type(3) { animation-delay: .49s; }
+.menu { animation: pop .6s cubic-bezier(.2,.9,.25,1.15) .55s both; }
+.menu li { animation: up .35s cubic-bezier(.2,.8,.2,1) both; }
+.kc.hit { animation: press .3s ease; }
+.menu li button { transition: background .15s; }
+.toast { transition: opacity .3s; }
+.floaty { position: absolute; z-index: -1; font-size: 18px; opacity: .9; animation: float 6s ease-in-out infinite; }
+.floaty.f1 { left: -4%; top: 6%; --r: -10deg; }
+.floaty.f2 { right: -2%; top: 18%; --r: 8deg; animation-delay: -2s; font-size: 22px; }
+.floaty.f3 { left: 2%; bottom: 16%; --r: 6deg; animation-delay: -4s; }
+.floaty.f4 { right: 4%; bottom: 4%; --r: -6deg; animation-delay: -1s; font-size: 15px; }
+@media (max-width: 900px) { .floaty { display: none; } }
+.btn .ms { transition: transform .25s; }
+.btn.primary:hover .ms { transform: translateY(2px); }
+.asset .go { transition: transform .25s; }
+.asset:hover .go { transform: translateY(2px); }
+.brand svg { transition: transform .2s; }
+.brand:hover svg { transform: translateY(1px) scale(.96); }
+
+/* scroll reveal: only armed by script, so the page is complete without it */
+.js-rv .rv { transition: opacity .7s cubic-bezier(.2,.8,.2,1), transform .7s cubic-bezier(.2,.8,.2,1); transition-delay: var(--d, 0s); }
+.js-rv .rv:not(.in) { opacity: 0; transform: translateY(26px); }
+
+/* privacy */
+.split { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px; }
+@media (max-width: 860px) { .split { grid-template-columns: minmax(0, 1fr); gap: 28px; } }
+.split h3 { margin: 12px 0 8px; font-size: 18px; display: flex; gap: 10px; align-items: center; }
+.split h3 .ms { color: var(--blue); }
+.split p { margin: 0; color: var(--mist); font-size: 15px; }
+
+/* download */
+.dl { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 44px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; margin-top: 96px; }
+@media (max-width: 860px) { .dl { grid-template-columns: minmax(0, 1fr); padding: 28px 22px; } }
+.dl h2 { font-family: var(--f-display); font-weight: 900; font-size: clamp(30px, 4vw, 44px); margin: 0 0 10px; line-height: 1.15; }
+.dl .sub { margin: 0; color: var(--mist); }
+.assets { display: grid; gap: 10px; }
+.asset { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; color: var(--ink); min-height: 64px; }
+.asset:hover { text-decoration: none; border-color: var(--blue); }
+.asset .ms { font-size: 26px; color: var(--mist); }
+.asset .t { flex: 1; min-width: 0; display: grid; }
+.asset .t b { font-size: 15px; }
+.asset .t span { font-size: 12.5px; color: var(--mist); font-family: var(--f-mono); overflow-wrap: anywhere; }
+.asset .go { color: var(--blue); }
+.asset.rec { border-color: var(--blue); }
+.notes { font-size: 13.5px; color: var(--mist); display: grid; gap: 6px; margin-top: 18px; }
+.notes p { margin: 0; }
+
+footer { padding-block: 64px 48px; color: var(--mist); font-size: 13.5px; }
+.foot { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; border-top: 1px solid var(--line); padding-top: 28px; }
+.foot .brand { font-size: 15px; }
+.foot .brand svg { width: 22px; height: 22px; }
+.foot nav { display: flex; gap: 18px; margin-left: auto; flex-wrap: wrap; }
+.foot a { color: var(--mist); }
+</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="lg-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3A66E8"/><stop offset="1" stop-color="#1F45BC"/></linearGradient>
+    <linearGradient id="lg-skirt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F7F8FB"/><stop offset="0.62" stop-color="#D9DEE7"/><stop offset="1" stop-color="#B6BECD"/></linearGradient>
+    <linearGradient id="lg-face" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E3E7EE"/><stop offset="0.55" stop-color="#F6F7FA"/><stop offset="1" stop-color="#FFFFFF"/></linearGradient>
+    <symbol id="logo" viewBox="0 0 100 100">
+      <rect width="100" height="100" rx="23" fill="url(#lg-bg)"/>
+      <rect x="15" y="13" width="70" height="72" rx="17" fill="url(#lg-skirt)"/>
+      <rect x="22" y="16" width="56" height="54" rx="13" fill="#C9D0DC"/>
+      <rect x="23" y="19" width="54" height="51" rx="12" fill="url(#lg-face)"/>
+      <path d="M39 33H61L39 55H61" fill="none" stroke="#2A55D6" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header class="top" id="top">
+  <div class="wrap nav">
+    <a class="brand" href="#" aria-label="ZZTools 首页"><svg aria-hidden="true"><use href="#logo"/></svg><span><b>ZZ</b>Tools</span></a>
+    <nav aria-label="页面导航">
+      <a class="hide-sm" href="#tools">功能</a>
+      <a class="hide-sm" href="#privacy">隐私</a>
+      <a class="hide-sm" href="https://github.com/henrry228/ZZTools-releases/releases">更新日志</a>
+      <a class="btn-sm" href="#download">下载</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap hero">
+    <div>
+      <div class="eyebrow a1"><span>Windows</span><span aria-hidden="true">/</span><span>macOS</span><span aria-hidden="true">/</span><span>免费</span></div>
+      <h1 class="a2">一按<em>即得</em></h1>
+      <p class="lede a3">常驻托盘的小工具箱。按 <span class="kc" data-k="mod1">Shift</span> <span class="kc" data-k="mod2">Alt</span> <span class="kc">Z</span> 呼出菜单，数字键选工具，字母键选结果，结果自动复制；光标在输入框里时直接帮你填进去。</p>
+      <div class="cta a4">
+        <a class="btn primary" id="cta-main" href="https://github.com/henrry228/ZZTools-releases/releases/latest"><span class="ms" aria-hidden="true">download</span><span id="cta-label">下载 ZZTools</span></a>
+        <a class="btn ghost" id="cta-alt" href="#download"><span id="cta-alt-label">其他平台</span></a>
+      </div>
+      <div class="meta a5"><span id="ver">最新版本</span> · Windows 10 1809+ · macOS 12+</div>
+    </div>
+
+    <div class="stage">
+      <div class="menu" id="menu" role="application" aria-label="ZZTools 快捷菜单演示">
+        <div class="menu-head">
+          <svg aria-hidden="true"><use href="#logo"/></svg>
+          <span class="crumb" id="crumb">ZZTools</span>
+          <span class="right" id="head-right" aria-hidden="true">⇧⌥Z</span>
+        </div>
+        <ul id="rows"></ul>
+        <div class="menu-foot" aria-hidden="true" id="foot"></div>
+      </div>
+      <span class="kc floaty f1" aria-hidden="true">1</span>
+      <span class="kc floaty f2" aria-hidden="true">Q</span>
+      <span class="kc floaty f3" aria-hidden="true">⌥</span>
+      <span class="kc floaty f4" aria-hidden="true">Esc</span>
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+      <div class="hint" id="hint">它在自己演示。你也可以直接按键盘 <span class="kc">1</span> 然后 <span class="kc">Q</span>，<span class="kc">Esc</span> 返回</div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="stats rv">
+      <div><strong class="num" data-to="20" data-fmt="~{} MB">~20 MB</strong><span>后台常驻内存，Rust 原生编写，不带浏览器内核</span></div>
+      <div><strong class="num" data-to="30" data-fmt="&lt;{} ms">&lt;30 ms</strong><span>按下快捷键到菜单出现，窗口预先创建，不抢焦点</span></div>
+      <div><strong class="num" data-to="2" data-fmt="{} 层">2 层</strong><span>数字键选工具，字母键选结果，手不离键盘</span></div>
+    </div>
+  </div>
+
+  <section class="block wrap" id="tools" aria-labelledby="tools-title">
+    <div class="sec-head rv">
+      <h2 id="tools-title">十个工具，一个菜单</h2>
+      <p>菜单里按数字直达，每个工具也有完整页面，常用的还能开成置顶小窗。</p>
+    </div>
+    <div class="bento">
+      <article class="b wide rv">
+        <div class="b-top"><span class="kc">1</span><h3>TOTP</h3><span class="ms" aria-hidden="true">password</span></div>
+        <p>两步验证码按备注列出，实时刷新，选中即复制。支持 Steam 与 HOTP，查看密钥需要指纹或系统密码。</p>
+        <div class="viz otp" aria-hidden="true" id="v-otp"></div>
+      </article>
+      <article class="b rv" style="--d:.06s">
+        <div class="b-top"><span class="kc">2</span><h3>随机字符</h3><span class="ms" aria-hidden="true">casino</span></div>
+        <p>六种字符组合，默认 12 位，可排除易混字符，也能生成 UUID。</p>
+        <div class="viz" aria-hidden="true"><span class="lbl" id="v-rnd-l">全混合 · 12 位</span><span class="big" id="v-rnd">k7Rm2xPq9LwT</span></div>
+      </article>
+      <article class="b rv" style="--d:.12s">
+        <div class="b-top"><span class="kc">3</span><h3>时间换算</h3><span class="ms" aria-hidden="true">schedule</span></div>
+        <p>时间戳、常见格式、北京、美东美西与 UTC。选中一串时间戳再呼出，直接换算。</p>
+        <div class="viz" aria-hidden="true"><span class="lbl">UNIX 时间戳</span><span class="big" id="v-ts">1792594367</span><span class="lbl" id="v-tz"></span></div>
+      </article>
+
+      <article class="b rv">
+        <div class="b-top"><span class="kc">4</span><h3>编码解码</h3><span class="ms" aria-hidden="true">code</span></div>
+        <p>Base64、URL、HTML 实体、Unicode、Hex 与哈希，对剪贴板或选中文字一键处理。</p>
+        <div class="viz" aria-hidden="true"><span class="lbl">一按即得 → <span id="v-enc-l">Base64</span></span><span class="row"><span class="caret" id="v-enc"></span></span></div>
+      </article>
+      <article class="b rv" style="--d:.06s">
+        <div class="b-top"><span class="kc">5</span><h3>剪贴历史</h3><span class="ms" aria-hidden="true">content_paste</span></div>
+        <p>最近 500 条，只存本机，永不同步。密码类内容自动隐藏，45 秒后清除。</p>
+        <div class="viz clip" aria-hidden="true" id="v-clip"></div>
+      </article>
+      <article class="b wide rv" style="--d:.12s">
+        <div class="b-top"><span class="kc">A</span><h3>截图录屏</h3><span class="ms" aria-hidden="true">screenshot_region</span></div>
+        <p>独立快捷键 <code data-hk="A">Shift+Alt+A</code>。数字键切换标注工具，<code>O</code> 识字、<code>P</code> 贴图、<code>L</code> 长截图、<code>Q</code> 识别二维码，还能测距取色，录屏导出 MP4 或 GIF。</p>
+        <div class="viz shot" aria-hidden="true">
+          <div class="win"><i style="width:40%"></i><i style="width:86%"></i><i style="width:72%"></i><i style="width:64%"></i><i style="width:80%"></i><i style="width:30%"></i></div>
+          <div class="sel"><b>1280 × 720</b></div>
+          <div class="bar"><span class="kc">1</span><span class="kc">2</span><span class="kc">3</span><span class="kc">O</span><span class="kc">P</span><span class="kc">L</span></div>
+        </div>
+      </article>
+
+      <article class="b rv">
+        <div class="b-top"><span class="kc">6</span><h3>二维码</h3><span class="ms" aria-hidden="true">qr_code_2</span></div>
+        <p>剪贴板里的链接或文字一键变成二维码，手机扫一下就拿走。</p>
+        <div class="viz" aria-hidden="true"><div class="qrbox"><canvas id="v-qr" width="25" height="25"></canvas><span id="v-qr-t">https://github.com/henrry228</span></div></div>
+      </article>
+      <article class="b rv" style="--d:.06s">
+        <div class="b-top"><span class="kc">7</span><h3>网络信息</h3><span class="ms" aria-hidden="true">lan</span></div>
+        <p>本机 IP、公网 IP、地区与运营商，排查网络和代理时不用再开网页。</p>
+        <div class="viz" aria-hidden="true"><span class="row"><span>公网 IP</span><span>203.0.113.42</span></span><div class="bars" id="v-net"></div></div>
+      </article>
+      <article class="b rv" style="--d:.12s">
+        <div class="b-top"><span class="kc">8</span><h3>汇率换算</h3><span class="ms" aria-hidden="true">currency_exchange</span></div>
+        <p>多币种同时换算，任意一行当基准，带计算器键盘和走势图。</p>
+        <div class="viz" aria-hidden="true"><span class="row"><span>USD</span><span class="caret" id="v-fx">0</span></span><span class="row"><span>CNY</span><span id="v-fx-c">0.00</span></span><span class="lbl">示例汇率</span></div>
+      </article>
+      <article class="b rv" style="--d:.18s">
+        <div class="b-top"><span class="kc">T</span><h3>文字翻译</h3><span class="ms" aria-hidden="true">translate</span></div>
+        <p>独立快捷键 <code data-hk="T">Shift+Alt+T</code>，选中即翻。中文译英文，其他语言译中文。</p>
+        <div class="viz" aria-hidden="true"><span class="lbl" id="v-tr-s">Ship it before Friday.</span><span class="row"><span class="caret" id="v-tr"></span></span></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="block wrap" id="privacy" aria-labelledby="pv-title">
+    <div class="sec-head rv">
+      <h2 id="pv-title">数据在你手里</h2>
+      <p>不需要账号，没有服务器。同步走你自己的存储。</p>
+    </div>
+    <div class="split rv">
+      <div><h3><span class="ms" aria-hidden="true">lock</span>端到端加密</h3><p>配置和 2FA 密钥合成一个加密文件，XChaCha20-Poly1305 加密，同步密码只在你的设备上。</p></div>
+      <div><h3><span class="ms" aria-hidden="true">sync</span>同步用你自己的盘</h3><p>WebDAV（坚果云、NAS 都行），或者放进 iCloud、OneDrive 文件夹。多台电脑按条目合并。</p></div>
+      <div><h3><span class="ms" aria-hidden="true">visibility_off</span>不打扰屏幕</h3><p>菜单不会出现在录屏和截图里。剪贴历史只留在本机，敏感内容自动清除。</p></div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <section class="dl rv" id="download" aria-labelledby="dl-title">
+      <div>
+        <h2 id="dl-title">下载 ZZTools</h2>
+        <p class="sub" id="dl-sub">免费使用。安装后在托盘里常驻，按 Shift+Alt+Z 开始。</p>
+        <div class="notes">
+          <p>macOS 版本同时支持 Apple 芯片和 Intel。</p>
+          <p>Windows 便携版解压即用，设置保存在程序旁边。</p>
+          <p id="mac-note">如果 macOS 提示“无法验证开发者”，在“系统设置 › 隐私与安全性”里点“仍要打开”。</p>
+        </div>
+      </div>
+      <div class="assets">
+        <a class="asset" id="a-win" data-os="win" href="https://github.com/henrry228/ZZTools-releases/releases/latest">
+          <span class="ms" aria-hidden="true">desktop_windows</span>
+          <span class="t"><b>Windows 安装版</b><span data-file>Windows 10 1809 及以上 · x64</span></span>
+          <span class="ms go" aria-hidden="true">download</span>
+        </a>
+        <a class="asset" id="a-zip" data-os="win" href="https://github.com/henrry228/ZZTools-releases/releases/latest">
+          <span class="ms" aria-hidden="true">folder_zip</span>
+          <span class="t"><b>Windows 便携版</b><span data-file>免安装 zip · x64</span></span>
+          <span class="ms go" aria-hidden="true">download</span>
+        </a>
+        <a class="asset" id="a-mac" data-os="mac" href="https://github.com/henrry228/ZZTools-releases/releases/latest">
+          <span class="ms" aria-hidden="true">laptop_mac</span>
+          <span class="t"><b>macOS</b><span data-file>macOS 12 及以上 · 通用版 dmg</span></span>
+          <span class="ms go" aria-hidden="true">download</span>
+        </a>
+        <a class="asset" href="https://github.com/henrry228/ZZTools-releases/releases">
+          <span class="ms" aria-hidden="true">history</span>
+          <span class="t"><b>历史版本与更新日志</b><span>GitHub Releases</span></span>
+          <span class="ms go" aria-hidden="true">arrow_outward</span>
+        </a>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="wrap">
+  <div class="foot">
+    <a class="brand" href="#" aria-label="回到顶部"><svg aria-hidden="true"><use href="#logo"/></svg><span><b>ZZ</b>Tools</span></a>
+    <span>一按即得</span>
+    <nav aria-label="页脚">
+      <a href="#download">下载</a>
+      <a href="https://github.com/henrry228/ZZTools-releases/releases">更新日志</a>
+      <a href="https://github.com/henrry228/ZZTools-releases/issues">反馈问题</a>
+    </nav>
+  </div>
+</footer>
+
+
+<script>
+(function () {
+  var REPO = "henrry228/ZZTools-releases";
+  var ua = navigator.userAgent || "";
+  var isMac = /Mac|iPhone|iPad/.test(navigator.platform || ua);
+  var os = isMac ? "mac" : "win";
+  var calm = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function $(id) { return document.getElementById(id); }
+  function pad(n) { return String(n).padStart(2, "0"); }
+  function rand(set, n) { var s = "", a = new Uint32Array(n); if (window.crypto && crypto.getRandomValues) crypto.getRandomValues(a); else for (var i = 0; i < n; i++) a[i] = Math.random() * 4e9; for (var j = 0; j < n; j++) s += set[a[j] % set.length]; return s; }
+  function code(seed) { var t = Math.floor(Date.now() / 30000); var x = (t * 2654435761 + seed * 40503) >>> 0; x ^= x >>> 13; x = (x * 1274126177) >>> 0; return String(x % 1000000).padStart(6, "0"); }
+  function fmtTZ(tz) { try { return new Intl.DateTimeFormat("zh-CN", { timeZone: tz, hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date()); } catch (e) { return "--"; } }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  var U = "ABCDEFGHJKLMNPQRSTUVWXYZ", L = "abcdefghijkmnopqrstuvwxyz", D = "23456789";
+
+  /* ---- hotkey labels ---- */
+  document.querySelectorAll('[data-k="mod1"]').forEach(function (e) { e.textContent = os === "mac" ? "⇧" : "Shift"; });
+  document.querySelectorAll('[data-k="mod2"]').forEach(function (e) { e.textContent = os === "mac" ? "⌥" : "Alt"; });
+  document.querySelectorAll("[data-hk]").forEach(function (e) { e.textContent = (os === "mac" ? "⇧⌥" : "Shift+Alt+") + e.dataset.hk; });
+  $("head-right").textContent = os === "mac" ? "⇧⌥Z" : "Shift+Alt+Z";
+
+  /* ---- live demo menu ---- */
+  var tools = [
+    { k: "1", name: "TOTP", icon: "password", items: function () { return [["GitHub", code(1)], ["Google", code(2)], ["阿里云", code(3)], ["Cloudflare", code(4)]]; } },
+    { k: "2", name: "随机字符", icon: "casino", items: function () { return [["全混合", rand(U + L + D + "!@#$%", 12)], ["大小写混合", rand(U + L, 12)], ["纯数字", rand("0123456789", 12)], ["纯小写", rand(L, 12)], ["UUID", (crypto.randomUUID ? crypto.randomUUID() : rand("0123456789abcdef", 32))]]; } },
+    { k: "3", name: "时间换算", icon: "schedule", items: function () { var d = new Date(); return [["UNIX 时间戳", String(Math.floor(d / 1000))], ["本地时间", d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + " " + pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds())], ["北京时间", fmtTZ("Asia/Shanghai")], ["美东时间", fmtTZ("America/New_York")], ["UTC", d.toISOString().slice(0, 19) + "Z"]]; } },
+    { k: "4", name: "编码解码", icon: "code", items: function () { var s = "一按即得"; return [["Base64", btoa(unescape(encodeURIComponent(s)))], ["URL 编码", encodeURIComponent(s)], ["Unicode", s.split("").map(function (c) { return "\\u" + c.charCodeAt(0).toString(16); }).join("")]]; } },
+    { k: "5", name: "剪贴历史", icon: "content_paste", items: function () { return [["https://github.com/henrry228", "1 分钟前"], ["会议改到周四下午三点", "8 分钟前"], ["SELECT * FROM orders LIMIT 20", "23 分钟前"]]; } },
+    { k: "6", name: "二维码", icon: "qr_code_2", items: function () { return [["剪贴板内容生成二维码", ""], ["识别屏幕上的二维码", ""]]; } },
+    { k: "7", name: "网络信息", icon: "lan", items: function () { return [["本机 IP", "192.168.1.23"], ["公网 IP", "203.0.113.42"], ["地区", "上海 · 示例"]]; } },
+    { k: "8", name: "汇率换算", icon: "currency_exchange", items: function () { return [["美元 USD → 人民币", "实时汇率"], ["欧元 EUR → 人民币", "实时汇率"], ["打开换算窗口", os === "mac" ? "⌘O" : "Ctrl+O"]]; } }
+  ];
+  var L2 = ["Q", "W", "E", "R", "T"];
+  var rows = $("rows"), crumb = $("crumb"), foot = $("foot"), toast = $("toast");
+  var cur = null, sel = 0, toastT, animRows = true;
+  function kc(t) { return '<span class="kc">' + t + "</span>"; }
+  function render() {
+    var html = "", d = function (i) { return animRows && !calm ? ' style="animation-delay:' + (i * 0.035).toFixed(3) + 's"' : ' style="animation:none"'; };
+    if (cur === null) {
+      crumb.textContent = "ZZTools";
+      tools.forEach(function (t, i) { html += "<li" + d(i) + '><button type="button" data-i="' + i + '" class="' + (i === sel ? "on" : "") + '">' + kc(t.k) + '<span class="lab">' + t.name + '</span><span class="ms" aria-hidden="true">' + t.icon + "</span></button></li>"; });
+      foot.innerHTML = "<span>" + kc("1") + "–" + kc("8") + " 选择工具</span><span>" + kc("Tab") + " 移动</span><span>" + kc("Esc") + " 关闭</span>";
+    } else {
+      var t = tools[cur]; crumb.textContent = "ZZTools › " + t.name;
+      t._cache = t.items();
+      t._cache.forEach(function (r, i) { html += "<li" + d(i) + '><button type="button" data-j="' + i + '" class="' + (i === sel ? "on" : "") + '">' + kc(L2[i]) + '<span class="lab">' + esc(r[0]) + '</span><span class="val">' + esc(r[1]) + "</span></button></li>"; });
+      foot.innerHTML = "<span>" + kc("Q") + "–" + kc("T") + " 复制</span><span>" + kc("Esc") + " 返回</span><span>" + kc(os === "mac" ? "⌘O" : "Ctrl+O") + " 完整窗口</span>";
+    }
+    rows.innerHTML = html;
+    animRows = true;
+  }
+  function hitRow(attr, idx) { var b = rows.querySelector("[" + attr + '="' + idx + '"] .kc'); if (b) { b.classList.remove("hit"); void b.offsetWidth; b.classList.add("hit"); } }
+  function pick(j, quiet) {
+    var t = tools[cur], r = t._cache[j]; if (!r) return;
+    var v = r[1] && cur !== 4 ? r[1] : r[0];
+    sel = j; animRows = false; render(); hitRow("data-j", j);
+    var done = function () { clearTimeout(toastT); toast.textContent = "已复制 " + (v.length > 28 ? v.slice(0, 28) + "…" : v); toastT = setTimeout(function () { toast.textContent = ""; }, 2200); };
+    if (quiet) { done(); return; }
+    try { navigator.clipboard.writeText(v).then(done, done); } catch (e) { done(); }
+  }
+  function open(i) { hitRow("data-i", i); setTimeout(function () { cur = i; sel = 0; render(); }, calm ? 0 : 140); }
+  function back() { if (cur !== null) { sel = cur; cur = null; render(); } }
+  function move(dir) { var n = cur === null ? tools.length : tools[cur]._cache.length; sel = (sel + dir + n) % n; animRows = false; render(); }
+
+  /* autoplay until the visitor touches the menu or the keyboard */
+  var auto = !calm, step = 0, autoT;
+  var script = [[0, 0], [2, 0], [1, 0], [3, 0], [7, 2], [4, 1]];
+  function stopAuto() { if (!auto) return; auto = false; clearTimeout(autoT); $("hint").innerHTML = "试试键盘 " + kc("1") + "–" + kc("8") + " 选工具，" + kc("Q") + " 复制，" + kc("Esc") + " 返回"; }
+  function tick() {
+    if (!auto) return;
+    var s = script[step % script.length];
+    if (cur === null) {
+      if (sel !== s[0]) { move(s[0] > sel ? 1 : -1); autoT = setTimeout(tick, 260); return; }
+      open(s[0]); autoT = setTimeout(tick, 1100); return;
+    }
+    if (sel !== s[1]) { move(1); autoT = setTimeout(tick, 320); return; }
+    if (!toast.textContent) { pick(s[1], true); autoT = setTimeout(tick, 1500); return; }
+    toast.textContent = ""; back(); step++; autoT = setTimeout(tick, 900);
+  }
+  render();
+  if (auto) autoT = setTimeout(tick, 2600);
+  ["pointerdown", "wheel"].forEach(function (ev) { $("menu").addEventListener(ev, stopAuto, { passive: true }); });
+
+  rows.addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    if (b.dataset.i != null) open(+b.dataset.i); else pick(+b.dataset.j);
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    var tag = (e.target.tagName || "").toLowerCase(); if (tag === "input" || tag === "textarea") return;
+    var k = e.key;
+    if (cur === null && /^[1-8]$/.test(k)) { stopAuto(); open(+k - 1); e.preventDefault(); return; }
+    if (cur !== null) {
+      var j = L2.indexOf(k.toUpperCase());
+      if (j >= 0 && j < tools[cur]._cache.length) { stopAuto(); pick(j); e.preventDefault(); return; }
+      if (k === "Escape" || k === "Backspace") { stopAuto(); back(); e.preventDefault(); return; }
+    }
+    if (k === "Tab" && document.activeElement === document.body) { stopAuto(); move(e.shiftKey ? -1 : 1); e.preventDefault(); }
+  });
+  setInterval(function () { if (cur === 0 || cur === 2) { animRows = false; render(); } }, 1000);
+
+  /* ---- sticky header border ---- */
+  var top = $("top");
+  addEventListener("scroll", function () { top.classList.toggle("scrolled", scrollY > 8); }, { passive: true });
+
+  /* ---- scroll reveal + count-up ---- */
+  function countUp(el) {
+    var to = +el.dataset.to, fmt = el.dataset.fmt, t0 = performance.now();
+    (function f(t) { var p = Math.min(1, (t - t0) / 900), e = 1 - Math.pow(1 - p, 3); el.innerHTML = fmt.replace("{}", Math.round(to * e)); if (p < 1) requestAnimationFrame(f); })(t0);
+  }
+  if ("IntersectionObserver" in window && !calm) {
+    document.documentElement.classList.add("js-rv");
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        var el = en.target; el.classList.add("in"); io.unobserve(el);
+        el.querySelectorAll("[data-to]").forEach(countUp);
+        setTimeout(function () { el.classList.remove("rv"); }, 1200);
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll(".rv").forEach(function (el) { io.observe(el); });
+    setTimeout(function () { document.querySelectorAll(".rv:not(.in)").forEach(function (el) { if (el.getBoundingClientRect().top < innerHeight) el.classList.add("in"); }); }, 1500);
+  }
+
+  /* ---- bento live visuals ---- */
+  var otpBox = $("v-otp"), names = ["GitHub", "Google", "阿里云"], last = [];
+  var C = 2 * Math.PI * 9;
+  otpBox.innerHTML = names.map(function (n, i) { return '<div class="otp-row"><span class="n">' + n + '</span><span class="c" id="otp' + i + '"></span><svg class="ring" viewBox="0 0 22 22"><circle class="bg" cx="11" cy="11" r="9"/><circle class="fg" cx="11" cy="11" r="9" stroke-dasharray="' + C.toFixed(2) + '"/></svg></div>'; }).join("");
+  function otpTick() {
+    var left = 30 - (Date.now() / 1000) % 30;
+    names.forEach(function (_, i) {
+      var c = code(i + 1), el = $("otp" + i), s = c.slice(0, 3) + " " + c.slice(3);
+      if (last[i] !== s) { el.textContent = s; if (last[i] && !calm) { el.classList.remove("flip"); void el.offsetWidth; el.classList.add("flip"); } last[i] = s; }
+    });
+    otpBox.querySelectorAll(".fg").forEach(function (r) { r.style.strokeDashoffset = (C * (1 - left / 30)).toFixed(2); });
+  }
+  otpTick(); setInterval(otpTick, 250);
+
+  var modes = [["全混合", U + L + D + "!@#$%"], ["纯数字", "0123456789"], ["大小写混合", U + L], ["纯大写", U], ["纯小写", L]], mi = 0;
+  function scramble(el, finalText, ms) {
+    if (calm) { el.textContent = finalText; return; }
+    var t0 = performance.now(), set = U + L + D;
+    (function f(t) { var p = (t - t0) / ms; if (p >= 1) { el.textContent = finalText; return; } var n = Math.floor(finalText.length * p); el.textContent = finalText.slice(0, n) + rand(set, finalText.length - n); requestAnimationFrame(f); })(t0);
+  }
+  function rndTick() { var m = modes[mi++ % modes.length]; $("v-rnd-l").textContent = m[0] + " · 12 位"; scramble($("v-rnd"), rand(m[1], 12), 600); }
+  rndTick(); setInterval(rndTick, 2600);
+
+  function tsTick() { $("v-ts").textContent = Math.floor(Date.now() / 1000); $("v-tz").textContent = "北京 " + fmtTZ("Asia/Shanghai") + " · 纽约 " + fmtTZ("America/New_York") + " · UTC " + fmtTZ("UTC"); }
+  tsTick(); setInterval(tsTick, 1000);
+
+  function typer(el, list, onNext, hold) {
+    var i = 0;
+    function run() {
+      var item = list[i++ % list.length]; if (onNext) onNext(item);
+      var txt = item[1], n = 0;
+      if (calm) { el.textContent = txt; setTimeout(run, hold); return; }
+      (function f() { el.textContent = txt.slice(0, n++); if (n <= txt.length) setTimeout(f, 45); else setTimeout(run, hold); })();
+    }
+    run();
+  }
+  var s0 = "一按即得";
+  typer($("v-enc"), [["Base64", btoa(unescape(encodeURIComponent(s0)))], ["URL", encodeURIComponent(s0)], ["Unicode", s0.split("").map(function (c) { return "\\u" + c.charCodeAt(0).toString(16); }).join("")], ["SHA-1", "f1b6…e09a"]], function (it) { $("v-enc-l").textContent = it[0]; }, 1800);
+  typer($("v-tr"), [["Ship it before Friday.", "周五前发布。"], ["Où est la gare ?", "火车站在哪里？"], ["这个按钮放右边", "Put this button on the right"], ["Merci beaucoup", "非常感谢"]], function (it) { $("v-tr-s").textContent = it[0]; }, 2000);
+
+  var clips = ["https://github.com/henrry228", "会议改到周四下午三点", "SELECT * FROM orders LIMIT 20", "192.168.1.23", "rgb(42, 85, 214)", "收货地址：上海市…", "npm run build"], ci = 0, clipBox = $("v-clip");
+  function clipTick() {
+    var d = document.createElement("div"); d.textContent = clips[ci++ % clips.length]; d.className = calm ? "" : "new";
+    clipBox.insertBefore(d, clipBox.firstChild); while (clipBox.children.length > 3) clipBox.removeChild(clipBox.lastChild);
+  }
+  clipTick(); clipTick(); clipTick(); clipTick(); setInterval(clipTick, 2400);
+
+  var qr = $("v-qr"), qx = qr.getContext("2d"), urls = ["https://github.com/henrry228", "WIFI:S:Home-5G;T:WPA;;", "https://example.com/invite"], qi = 0;
+  function finder(m, x, y) { for (var i = 0; i < 7; i++) for (var j = 0; j < 7; j++) m[(y + j) * 25 + x + i] = (i === 0 || i === 6 || j === 0 || j === 6 || (i > 1 && i < 5 && j > 1 && j < 5)) ? 1 : 0; for (var k = -1; k <= 7; k++) { [[x + k, y - 1], [x + k, y + 7], [x - 1, y + k], [x + 7, y + k]].forEach(function (p) { if (p[0] >= 0 && p[0] < 25 && p[1] >= 0 && p[1] < 25) m[p[1] * 25 + p[0]] = 0; }); } }
+  function qrTick() {
+    var m = []; for (var i = 0; i < 625; i++) m[i] = Math.random() < 0.48 ? 1 : 0;
+    finder(m, 0, 0); finder(m, 18, 0); finder(m, 0, 18);
+    $("v-qr-t").textContent = urls[qi++ % urls.length];
+    var ink = getComputedStyle(document.body).color, row = 0;
+    qx.clearRect(0, 0, 25, 25); qx.fillStyle = ink;
+    (function f() { for (var x = 0; x < 25; x++) if (m[row * 25 + x]) qx.fillRect(x, row, 1, 1); row++; if (row < 25) calm ? f() : requestAnimationFrame(f); })();
+  }
+  qrTick(); setInterval(qrTick, 3200);
+
+  var net = $("v-net"); for (var b = 0; b < 16; b++) net.appendChild(document.createElement("i"));
+  function netTick() { net.querySelectorAll("i").forEach(function (i) { i.style.height = (18 + Math.random() * 82).toFixed(0) + "%"; }); }
+  netTick(); setInterval(netTick, 1200);
+
+  var fx = [["100", 7.12], ["2500", 7.12], ["39.9", 7.12]], fi = 0;
+  function fxTick() {
+    var v = fx[fi++ % fx.length], el = $("v-fx"), n = 0;
+    (function f() { el.textContent = v[0].slice(0, ++n) || "0"; $("v-fx-c").textContent = (parseFloat(v[0].slice(0, n)) * v[1]).toFixed(2); if (n < v[0].length) setTimeout(f, calm ? 0 : 160); })();
+  }
+  fxTick(); setInterval(fxTick, 2800);
+
+  /* ---- downloads: latest release assets ---- */
+  var label = { win: "下载 Windows 版", mac: "下载 macOS 版" };
+  $("cta-label").textContent = label[os];
+  $("cta-alt-label").textContent = os === "mac" ? "Windows 版" : "macOS 版";
+  $(os === "mac" ? "a-mac" : "a-win").classList.add("rec");
+  $("dl-sub").textContent = "免费使用。安装后在托盘里常驻，按 " + (os === "mac" ? "⇧⌥Z" : "Shift+Alt+Z") + " 开始。";
+  function mb(n) { return (n / 1048576).toFixed(1) + " MB"; }
+  function apply(rel) {
+    var want = { "a-win": /-windows-x64-setup\.exe$/i, "a-zip": /-windows-x64-portable\.zip$/i, "a-mac": /-macos\.dmg$/i };
+    Object.keys(want).forEach(function (id) {
+      var a = (rel.assets || []).find(function (x) { return want[id].test(x.name); });
+      if (!a) return;
+      var el = $(id); el.href = a.browser_download_url;
+      el.querySelector("[data-file]").textContent = a.name + " · " + mb(a.size);
+    });
+    if (rel.tag_name) $("ver").textContent = "最新版本 " + rel.tag_name;
+    $("cta-main").href = $(os === "mac" ? "a-mac" : "a-win").href;
+  }
+  if (window.fetch) {
+    fetch("https://api.github.com/repos/" + REPO + "/releases/latest", { headers: { Accept: "application/vnd.github+json" } })
+      .then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(apply).catch(function () {});
+  }
+})();
+</script>
+
+</body>
+</html>
