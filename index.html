@@ -57,7 +57,7 @@ body { background: var(--paper); color: var(--ink); font-family: var(--f-body); 
 a { color: var(--blue); text-decoration: none; }
 a:hover { text-decoration: underline; }
 :focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; border-radius: 6px; }
-.ms { font-family: "Material Symbols Rounded"; font-weight: 400; font-style: normal; font-size: 20px; line-height: 1; display: inline-block; vertical-align: middle; letter-spacing: normal; text-transform: none; white-space: nowrap; font-feature-settings: "liga"; -webkit-font-smoothing: antialiased; }
+.ms { font-family: "Material Symbols Rounded"; font-weight: 400; font-style: normal; font-size: 20px; line-height: 1; display: inline-block; vertical-align: middle; letter-spacing: normal; text-transform: none; white-space: nowrap; width: 1em; height: 1em; overflow: hidden; text-align: center; font-feature-settings: "liga"; -webkit-font-smoothing: antialiased; }
 .wrap { max-width: 1120px; margin: 0 auto; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
 .mono { font-family: var(--f-mono); }
 .num { font-variant-numeric: tabular-nums; }
@@ -95,7 +95,8 @@ header.top.scrolled { border-bottom-color: var(--line); }
 .btn { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 22px; border-radius: 10px; font-weight: 600; font-size: 16px; border: 1px solid transparent; cursor: pointer; }
 .btn:hover { text-decoration: none; }
 .btn.primary { background: var(--blue); color: var(--on-blue); box-shadow: 0 3px 0 var(--blue-ink); }
-.btn.primary:hover { transform: translateY(1px); box-shadow: 0 2px 0 var(--blue-ink); }
+.btn.primary:hover { background: var(--blue-ink); }
+.btn.primary:active { box-shadow: 0 1px 0 var(--blue-ink); }
 .btn.ghost { background: var(--card); color: var(--ink); border-color: var(--line); }
 .btn.ghost:hover { border-color: var(--mist); }
 .btn small { font-weight: 400; opacity: .8; font-size: 13px; }
@@ -117,8 +118,8 @@ header.top.scrolled { border-bottom-color: var(--line); }
 .menu li .ms { color: var(--mist); font-size: 19px; }
 .menu-foot { display: flex; gap: 14px; flex-wrap: wrap; padding: 9px 14px; border-top: 1px solid var(--line); color: var(--mist); font-size: 12px; }
 .menu-foot .kc { font-size: 11px; }
-.toast { min-height: 1.4em; font-size: 13px; color: var(--mist); font-family: var(--f-mono); }
-.hint { font-size: 13px; color: var(--mist); text-align: center; }
+.toast { height: 22px; line-height: 22px; font-size: 13px; color: var(--mist); font-family: var(--f-mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.hint { font-size: 13px; color: var(--mist); text-align: center; min-height: 3.3em; }
 
 /* stats */
 .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-block: 1px solid var(--line); }
@@ -137,8 +138,8 @@ section.block { padding-block: 96px 0; }
 .bento { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
 @media (max-width: 1000px) { .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 600px) { .bento { grid-template-columns: minmax(0, 1fr); } .bento .wide { grid-column: auto; } }
-.b { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 22px; display: grid; grid-template-rows: auto auto 1fr; gap: 10px; min-width: 0; transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s, border-color .25s; }
-.b:hover { transform: translateY(-4px); box-shadow: var(--shadow); border-color: color-mix(in srgb, var(--blue) 40%, var(--line)); }
+.b { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 22px; display: grid; grid-template-rows: auto auto 1fr; gap: 10px; min-width: 0; transition: box-shadow .25s, border-color .25s; }
+.b:hover { box-shadow: var(--shadow); border-color: color-mix(in srgb, var(--blue) 40%, var(--line)); }
 .b:hover .b-top .kc { transform: translateY(2px); box-shadow: 0 0 0 var(--cap-skirt); }
 .b.wide { grid-column: span 2; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); grid-template-rows: auto 1fr; column-gap: 24px; }
 .b.wide .b-top, .b.wide p { grid-column: 1; }
@@ -223,7 +224,7 @@ section.block { padding-block: 96px 0; }
 .asset .go { transition: transform .25s; }
 .asset:hover .go { transform: translateY(2px); }
 .brand svg { transition: transform .2s; }
-.brand:hover svg { transform: translateY(1px) scale(.96); }
+.brand:hover svg { transform: scale(.96); }
 
 /* scroll reveal: only armed by script, so the page is complete without it */
 .js-rv .rv { transition: opacity .7s cubic-bezier(.2,.8,.2,1), transform .7s cubic-bezier(.2,.8,.2,1); transition-delay: var(--d, 0s); }
@@ -320,7 +321,7 @@ footer { padding-block: 64px 48px; color: var(--mist); font-size: 13.5px; }
       <span class="kc floaty f3" aria-hidden="true">⌥</span>
       <span class="kc floaty f4" aria-hidden="true">Esc</span>
       <div class="toast" id="toast" role="status" aria-live="polite"></div>
-      <div class="hint" id="hint">它在自己演示。你也可以直接按键盘 <span class="kc">1</span> 然后 <span class="kc">Q</span>，<span class="kc">Esc</span> 返回</div>
+      <div class="hint" id="hint">它在自己演示，你也可以直接按键盘 <span class="kc">1</span> 然后 <span class="kc">Q</span>，<span class="kc">Esc</span> 返回</div>
     </div>
   </div>
 
@@ -526,7 +527,7 @@ footer { padding-block: 64px 48px; color: var(--mist); font-size: 13.5px; }
   /* autoplay until the visitor touches the menu or the keyboard */
   var auto = !calm, step = 0, autoT;
   var script = [[0, 0], [2, 0], [1, 0], [3, 0], [7, 2], [4, 1]];
-  function stopAuto() { if (!auto) return; auto = false; clearTimeout(autoT); $("hint").innerHTML = "试试键盘 " + kc("1") + "–" + kc("8") + " 选工具，" + kc("Q") + " 复制，" + kc("Esc") + " 返回"; }
+  function stopAuto() { if (!auto) return; auto = false; clearTimeout(autoT);  }
   function tick() {
     if (!auto) return;
     var s = script[step % script.length];
