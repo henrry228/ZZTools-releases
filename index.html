@@ -303,7 +303,7 @@ footer { padding-block: 64px 48px; color: var(--mist); font-size: 13.5px; }
         <a class="btn primary" id="cta-main" href="https://github.com/henrry228/ZZTools-releases/releases/latest"><span class="ms" aria-hidden="true">download</span><span id="cta-label">下载 ZZTools</span></a>
         <a class="btn ghost" id="cta-alt" href="#download"><span id="cta-alt-label">其他平台</span></a>
       </div>
-      <div class="meta a5"><span id="ver">最新版本</span> · Windows 10 1809+ · macOS 12+</div>
+      <div class="meta a5"><span id="ver">最新版本 v1.0.3</span> · Windows 10 1809+ · macOS 12+</div>
     </div>
 
     <div class="stage">
@@ -422,17 +422,17 @@ footer { padding-block: 64px 48px; color: var(--mist); font-size: 13.5px; }
         </div>
       </div>
       <div class="assets">
-        <a class="asset" id="a-win" data-os="win" href="https://github.com/henrry228/ZZTools-releases/releases/latest">
+        <a class="asset" id="a-win" data-os="win" href="https://github.com/henrry228/ZZTools-releases/releases/download/v1.0.3/ZZTools-1.0.3-windows-x64-setup.exe">
           <span class="ms" aria-hidden="true">desktop_windows</span>
           <span class="t"><b>Windows 安装版</b><span data-file>Windows 10 1809 及以上 · x64</span></span>
           <span class="ms go" aria-hidden="true">download</span>
         </a>
-        <a class="asset" id="a-zip" data-os="win" href="https://github.com/henrry228/ZZTools-releases/releases/latest">
+        <a class="asset" id="a-zip" data-os="win" href="https://github.com/henrry228/ZZTools-releases/releases/download/v1.0.3/ZZTools-1.0.3-windows-x64-portable.zip">
           <span class="ms" aria-hidden="true">folder_zip</span>
           <span class="t"><b>Windows 便携版</b><span data-file>免安装 zip · x64</span></span>
           <span class="ms go" aria-hidden="true">download</span>
         </a>
-        <a class="asset" id="a-mac" data-os="mac" href="https://github.com/henrry228/ZZTools-releases/releases/latest">
+        <a class="asset" id="a-mac" data-os="mac" href="https://github.com/henrry228/ZZTools-releases/releases/download/v1.0.2/ZZTools-1.0.2-macos.dmg">
           <span class="ms" aria-hidden="true">laptop_mac</span>
           <span class="t"><b>macOS</b><span data-file>macOS 12 及以上 · 通用版 dmg</span></span>
           <span class="ms go" aria-hidden="true">download</span>
@@ -661,19 +661,25 @@ footer { padding-block: 64px 48px; color: var(--mist); font-size: 13.5px; }
   $(os === "mac" ? "a-mac" : "a-win").classList.add("rec");
   $("dl-sub").textContent = "免费使用。安装后在托盘里常驻，按 " + (os === "mac" ? "⇧⌥Z" : "Shift+Alt+Z") + " 开始。";
   function mb(n) { return (n / 1048576).toFixed(1) + " MB"; }
-  function apply(rel) {
+  function apply(list) {
+    var rels = (list || []).filter(function (r) { return !r.draft && !r.prerelease; });
+    if (!rels.length) return;
     var want = { "a-win": /-windows-x64-setup\.exe$/i, "a-zip": /-windows-x64-portable\.zip$/i, "a-mac": /-macos\.dmg$/i };
     Object.keys(want).forEach(function (id) {
-      var a = (rel.assets || []).find(function (x) { return want[id].test(x.name); });
-      if (!a) return;
-      var el = $(id); el.href = a.browser_download_url;
-      el.querySelector("[data-file]").textContent = a.name + " · " + mb(a.size);
+      for (var k = 0; k < rels.length; k++) {
+        var a = (rels[k].assets || []).find(function (x) { return want[id].test(x.name); });
+        if (!a) continue;
+        var el = $(id); el.href = a.browser_download_url;
+        el.querySelector("[data-file]").textContent = rels[k].tag_name + " · " + mb(a.size);
+        return;
+      }
     });
-    if (rel.tag_name) $("ver").textContent = "最新版本 " + rel.tag_name;
+    $("ver").textContent = "最新版本 " + rels[0].tag_name;
     $("cta-main").href = $(os === "mac" ? "a-mac" : "a-win").href;
   }
+  $("cta-main").href = $(os === "mac" ? "a-mac" : "a-win").href;
   if (window.fetch) {
-    fetch("https://api.github.com/repos/" + REPO + "/releases/latest", { headers: { Accept: "application/vnd.github+json" } })
+    fetch("https://api.github.com/repos/" + REPO + "/releases?per_page=10", { headers: { Accept: "application/vnd.github+json" } })
       .then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(apply).catch(function () {});
   }
 })();
