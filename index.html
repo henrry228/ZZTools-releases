@@ -28,6 +28,7 @@
   --paper: #F5F6F8;
   --card: #FFFFFF;
   --line: #E1E4EA;
+  --band: #121829; --band-fg: #EEF1F7; --band-mist: #A6AEC0; --band-card: #1A2236; --band-line: #2A3348; --band-accent: #93ACFF;
   --cap-top: #FFFFFF;
   --cap-skirt: #C9D0DC;
   --cap-text: #1B2130;
@@ -42,13 +43,13 @@
   :root:not([data-theme="light"]) {
     --blue: #7D9CFF; --blue-ink: #A9BDFF; --ink: #E8EBF2; --mist: #9BA3B4; --paper: #11151F; --card: #1A1F2B;
     --line: #2A3142; --cap-top: #2B3245; --cap-skirt: #0B0E15; --cap-text: #E8EBF2; --sel: #222C47; --on-blue: #0E1424;
-    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 40px rgba(0,0,0,.45); color-scheme: dark;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 40px rgba(0,0,0,.45); --band: #0A0E17; --band-card: #141A29; --band-line: #232B3D; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --blue: #7D9CFF; --blue-ink: #A9BDFF; --ink: #E8EBF2; --mist: #9BA3B4; --paper: #11151F; --card: #1A1F2B;
   --line: #2A3142; --cap-top: #2B3245; --cap-skirt: #0B0E15; --cap-text: #E8EBF2; --sel: #222C47; --on-blue: #0E1424;
-  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 40px rgba(0,0,0,.45); color-scheme: dark;
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 40px rgba(0,0,0,.45); --band: #0A0E17; --band-card: #141A29; --band-line: #232B3D; color-scheme: dark;
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
@@ -109,7 +110,7 @@ header.top.scrolled { border-bottom-color: var(--line); }
 .menu-head svg { width: 18px; height: 18px; }
 .menu-head .crumb { color: var(--ink); font-weight: 600; }
 .menu-head .right { margin-left: auto; font-family: var(--f-mono); font-size: 12px; }
-.menu ul { list-style: none; margin: 0; padding: 6px; min-height: 342px; }
+.menu ul { list-style: none; margin: 0; padding: 6px; min-height: 412px; }
 .menu li button { width: 100%; display: flex; align-items: center; gap: 12px; padding: 7px 10px; border: 0; background: transparent; color: var(--ink); font: inherit; text-align: left; border-radius: 8px; cursor: pointer; min-height: 40px; }
 .menu li button:hover, .menu li button.on { background: var(--sel); }
 .menu li .kc { font-size: 12px; flex: none; }
@@ -230,6 +231,106 @@ section.block { padding-block: 96px 0; }
 .js-rv .rv { transition: opacity .7s cubic-bezier(.2,.8,.2,1), transform .7s cubic-bezier(.2,.8,.2,1); transition-delay: var(--d, 0s); }
 .js-rv .rv:not(.in) { opacity: 0; transform: translateY(26px); }
 
+
+/* memo + chain viz */
+.viz.memo { align-content: start; gap: 6px; height: auto; min-height: 190px; }
+.memo-new { display: flex; align-items: center; gap: 8px; background: var(--card); border: 1px solid color-mix(in srgb, var(--blue) 45%, var(--line)); border-radius: 8px; padding: 7px 10px; min-height: 36px; white-space: nowrap; overflow: hidden; }
+.memo-new .ms { color: var(--blue); font-size: 18px; }
+.memo-row { display: flex; justify-content: space-between; gap: 12px; padding: 7px 10px; border-bottom: 1px dashed var(--line); font-family: var(--f-body); font-size: 13.5px; white-space: nowrap; min-width: 0; }
+.memo-row:last-child { border-bottom: 0; }
+.memo-row > span:first-child { overflow: hidden; text-overflow: ellipsis; }
+.memo-row > span:last-child { color: var(--mist); font-family: var(--f-mono); font-size: 12px; display: inline-flex; gap: 4px; align-items: center; flex: none; }
+.memo-row .ms { font-size: 15px; }
+.otp-row { padding: 9px 4px; }
+.spark { width: 100%; height: 48px; overflow: visible; }
+.spark path { fill: none; stroke: var(--blue); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.spark path.draw { animation: draw 1.4s cubic-bezier(.4,0,.2,1) both; }
+@keyframes draw { from { stroke-dashoffset: 400; } to { stroke-dashoffset: 0; } }
+code.hk { font-family: var(--f-mono); font-size: .9em; color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; }
+
+/* capture showcase */
+.cap-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 860px) { .cap-grid { grid-template-columns: minmax(0, 1fr); } }
+.cap { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 26px; display: grid; grid-template-rows: auto auto 1fr; gap: 12px; min-width: 0; transition: box-shadow .25s, border-color .25s; }
+.cap:hover { box-shadow: var(--shadow); border-color: color-mix(in srgb, var(--blue) 40%, var(--line)); }
+.cap-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.cap h3 { margin: 0; font-size: 20px; }
+.cap p { margin: 0; color: var(--mist); font-size: 15px; }
+.soon { font-family: var(--f-mono); font-size: 12px; color: var(--mist); border: 1px dashed var(--line); border-radius: 6px; padding: 2px 8px; }
+.beauty, .tl { align-self: end; height: 250px; border-radius: 12px; border: 1px solid var(--line); background: var(--paper); position: relative; overflow: hidden; }
+.b-canvas { position: absolute; left: 16px; right: 16px; top: 16px; bottom: 64px; border-radius: 10px; animation: bg 12s steps(1) infinite; }
+.b-shot { position: absolute; inset: 0; background: var(--card); border: 1px solid var(--line); overflow: hidden; animation: shot 12s cubic-bezier(.4,0,.2,1) infinite; }
+.b-bar { display: flex; gap: 5px; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+.b-bar i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+.b-body { display: grid; gap: 8px; padding: 12px; }
+.b-body i { display: block; height: 7px; border-radius: 4px; background: var(--line); }
+.b-ctrl { position: absolute; left: 16px; right: 16px; bottom: 12px; height: 40px; display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: center; font-size: 12px; color: var(--mist); }
+.b-sw { display: flex; align-items: center; gap: 6px; }
+.b-sw span, .b-sl span { margin-right: 4px; white-space: nowrap; }
+.b-sw i { width: 16px; height: 16px; border-radius: 5px; border: 2px solid transparent; box-shadow: 0 0 0 1px var(--line); }
+.b-sw .s1 { background: #2A55D6; animation: ring 12s steps(1) infinite; }
+.b-sw .s2 { background: #F2C88F; animation: ring 12s steps(1) -9s infinite; }
+.b-sw .s3 { background: #1B2130; animation: ring 12s steps(1) -6s infinite; }
+.b-sw .s4 { background: #DCE3F5; animation: ring 12s steps(1) -3s infinite; }
+.b-sl { display: flex; align-items: center; min-width: 0; }
+.b-sl b { position: relative; flex: 1; height: 4px; border-radius: 2px; background: var(--line); }
+.b-sl em { position: absolute; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; background: var(--card); border: 2px solid var(--blue); }
+.t-rad { animation: slide 12s cubic-bezier(.4,0,.2,1) infinite; }
+.t-pad { animation: slide 12s cubic-bezier(.4,0,.2,1) -1.5s infinite; }
+@keyframes bg { 0% { background: transparent; } 25% { background: #2A55D6; } 50% { background: #DCE3F5; } 75% { background: #1B2130; } }
+@keyframes ring { 0%, 75% { border-color: transparent; } 25%, 49% { border-color: var(--card); box-shadow: 0 0 0 2px var(--blue); } 50% { border-color: transparent; box-shadow: 0 0 0 1px var(--line); } }
+@keyframes shot { 0%, 20% { inset: 0; border-radius: 0; box-shadow: none; } 30%, 92% { inset: 18px 30px; border-radius: 12px; box-shadow: 0 12px 28px rgba(10,15,30,.28); } 100% { inset: 0; border-radius: 0; box-shadow: none; } }
+@keyframes slide { 0%, 20% { left: 4%; } 30%, 92% { left: 72%; } 100% { left: 4%; } }
+
+.tl-view { position: absolute; left: 16px; right: 16px; top: 16px; bottom: 96px; border-radius: 10px; background: color-mix(in srgb, var(--ink) 8%, var(--paper)); overflow: hidden; }
+.tl-frame { position: absolute; inset: 18px 22% 18px 22%; background: var(--card); border-radius: 8px; border: 1px solid var(--line); background-image: repeating-linear-gradient(0deg, transparent 0 14px, var(--line) 14px 21px); background-size: 100% 42px; animation: scrollv 3s linear infinite; }
+@keyframes scrollv { to { background-position: 0 -42px; } }
+.tl-rec { position: absolute; left: 12px; top: 10px; display: flex; gap: 6px; align-items: center; font: 600 11px var(--f-mono); color: var(--mist); }
+.tl-rec span { width: 8px; height: 8px; border-radius: 50%; background: #E0533D; animation: blink 1.2s steps(1) infinite; }
+.tl-chips { position: absolute; right: 10px; top: 8px; display: flex; gap: 6px; }
+.tl-chips .kc { font-size: 11px; }
+.tl-sp { animation: spd 6s steps(1) infinite; }
+@keyframes spd { 0%, 49% { background: var(--cap-top); color: var(--cap-text); } 50%, 100% { background: var(--blue); color: var(--on-blue); border-color: var(--blue); } }
+.tl-track { position: absolute; left: 16px; right: 16px; bottom: 44px; height: 40px; border-radius: 8px; background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--blue) 14%, var(--paper)) 0 38px, color-mix(in srgb, var(--blue) 22%, var(--paper)) 38px 40px); }
+.tl-clip { position: absolute; top: -3px; bottom: -3px; border: 2px solid var(--blue); border-radius: 9px; animation: trim 6s cubic-bezier(.4,0,.2,1) infinite; }
+.tl-clip .h { position: absolute; top: 50%; width: 8px; height: 22px; margin-top: -11px; border-radius: 3px; background: var(--blue); }
+.tl-clip .l { left: -5px; } .tl-clip .r { right: -5px; }
+@keyframes trim { 0%, 10% { left: 0; right: 0; } 35%, 90% { left: 16%; right: 24%; } 100% { left: 0; right: 0; } }
+.tl-head { position: absolute; top: -8px; bottom: -8px; width: 2px; background: var(--ink); border-radius: 1px; animation: play 6s linear infinite; }
+@keyframes play { 0% { left: 16%; } 100% { left: 76%; } }
+.tl-out { position: absolute; left: 16px; right: 16px; bottom: 12px; height: 22px; display: flex; justify-content: space-between; align-items: center; font: 12px var(--f-mono); color: var(--mist); }
+.tl-fmt { display: flex; gap: 6px; }
+.tl-fmt b { font-weight: 500; border: 1px solid var(--line); border-radius: 5px; padding: 1px 8px; background: var(--card); color: var(--ink); }
+.cap-keys { list-style: none; margin: 20px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px 26px; color: var(--mist); font-size: 14px; }
+.cap-keys li { display: flex; align-items: center; gap: 6px; }
+.cap-keys .kc { font-size: 12px; color: var(--cap-text); }
+
+/* security band */
+.band { margin-top: 96px; background: var(--band); color: var(--band-fg); padding-block: 88px; }
+.band-in { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); gap: 56px; align-items: start; }
+@media (max-width: 900px) { .band-in { grid-template-columns: minmax(0, 1fr); gap: 40px; } .band { padding-block: 64px; } }
+.band-eyebrow { font-family: var(--f-mono); font-size: 13px; letter-spacing: .08em; color: var(--band-accent); }
+.band h2 { font-family: var(--f-display); font-weight: 900; font-size: clamp(32px, 4.4vw, 50px); line-height: 1.12; margin: 10px 0 14px; text-wrap: balance; }
+.band-l > p { margin: 0; color: var(--band-mist); font-size: 16.5px; }
+.band-l > p.band-fine { margin-top: 18px; font-size: 14px; }
+.pw { margin-top: 28px; background: var(--band-card); border: 1px solid var(--band-line); border-radius: 14px; padding: 18px; display: grid; gap: 10px; }
+.pw-label { font-size: 12px; color: var(--band-mist); }
+.pw-field { height: 44px; display: flex; align-items: center; padding: 0 14px; border-radius: 9px; border: 1px solid var(--band-line); background: var(--band); font: 500 17px var(--f-mono); letter-spacing: .04em; white-space: nowrap; overflow: hidden; }
+.pw-meter { height: 6px; border-radius: 3px; background: var(--band-line); overflow: hidden; }
+.pw-meter i { display: block; height: 100%; width: 0; border-radius: 3px; background: var(--band-mist); transition: width .6s cubic-bezier(.2,.8,.2,1), background .3s; }
+.pw-msg { height: 20px; line-height: 20px; font-size: 13px; color: var(--band-mist); font-family: var(--f-mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pw-msg.bad { color: #F08672; }
+.pw-msg.ok { color: var(--band-accent); }
+.band-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--band-line); border: 1px solid var(--band-line); border-radius: 16px; overflow: hidden; }
+@media (max-width: 560px) { .band-grid { grid-template-columns: minmax(0, 1fr); } }
+.band-grid > div { background: var(--band); padding: 24px; display: grid; gap: 8px; align-content: start; transition: background .25s; }
+.band-grid > div:hover { background: var(--band-card); }
+.band-grid .ms { color: var(--band-accent); font-size: 24px; }
+.band-grid h3 { margin: 4px 0 0; font-size: 16.5px; }
+.band-grid p { margin: 0; color: var(--band-mist); font-size: 14px; line-height: 1.6; }
+.dl { margin-top: 96px; }
+.notes .upd { color: var(--ink); }
+
 /* privacy */
 .split { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px; }
 @media (max-width: 860px) { .split { grid-template-columns: minmax(0, 1fr); gap: 28px; } }
@@ -286,7 +387,8 @@ footer { padding-block: 64px 48px; color: var(--mist); font-size: 13.5px; }
     <a class="brand" href="#" aria-label="ZZTools 首页"><svg aria-hidden="true"><use href="#logo"/></svg><span><b>ZZ</b>Tools</span></a>
     <nav aria-label="页面导航">
       <a class="hide-sm" href="#tools">功能</a>
-      <a class="hide-sm" href="#privacy">隐私</a>
+      <a class="hide-sm" href="#capture">截图</a>
+      <a class="hide-sm" href="#privacy">安全</a>
       <a class="hide-sm" href="https://github.com/henrry228/ZZTools-releases/releases">更新日志</a>
       <a class="btn-sm" href="#download">下载</a>
     </nav>
@@ -336,59 +438,65 @@ footer { padding-block: 64px 48px; color: var(--mist); font-size: 13.5px; }
   <section class="block wrap" id="tools" aria-labelledby="tools-title">
     <div class="sec-head rv">
       <h2 id="tools-title">十个工具，一个菜单</h2>
-      <p>菜单里按数字直达，每个工具也有完整页面，常用的还能开成置顶小窗。</p>
+      <p>菜单里按 1 到 0 直达，每个工具也有完整页面，常用的还能开成置顶小窗。</p>
     </div>
     <div class="bento">
       <article class="b wide rv">
-        <div class="b-top"><span class="kc">1</span><h3>TOTP</h3><span class="ms" aria-hidden="true">password</span></div>
-        <p>两步验证码按备注列出，实时刷新，选中即复制。支持 Steam 与 HOTP，查看密钥需要指纹或系统密码。</p>
-        <div class="viz otp" aria-hidden="true" id="v-otp"></div>
+        <div class="b-top"><span class="kc">1</span><h3>备忘录</h3><span class="ms" aria-hidden="true">sticky_note_2</span></div>
+        <p>随手记、可提醒、可加密。按 <code data-hk="N">Shift+Alt+N</code> 弹出随手记小窗，想到就写，写完就走；重要的备忘用单独的密码锁起来。</p>
+        <div class="viz memo" aria-hidden="true">
+          <div class="memo-new"><span class="ms">edit_note</span><span class="caret" id="v-memo"></span></div>
+          <div class="memo-row"><span>周四发版清单</span><span><span class="ms">lock</span>已加密</span></div>
+          <div class="memo-row"><span>给爸妈订回家的票</span><span><span class="ms">alarm</span><span id="v-memo-t">明天 09:00</span></span></div>
+          <div class="memo-row"><span>Wi-Fi 与路由器密码</span><span><span class="ms">lock</span>已加密</span></div>
+        </div>
       </article>
       <article class="b rv" style="--d:.06s">
-        <div class="b-top"><span class="kc">2</span><h3>随机字符</h3><span class="ms" aria-hidden="true">casino</span></div>
+        <div class="b-top"><span class="kc">2</span><h3>TOTP</h3><span class="ms" aria-hidden="true">password</span></div>
+        <p>两步验证码实时刷新，选中即复制。支持 Steam 与 HOTP，查看密钥需要验证。</p>
+        <div class="viz otp" aria-hidden="true" id="v-otp"></div>
+      </article>
+      <article class="b rv" style="--d:.12s">
+        <div class="b-top"><span class="kc">3</span><h3>二维码</h3><span class="ms" aria-hidden="true">qr_code_2</span></div>
+        <p>剪贴板里的文字一键变二维码；粘贴图片或截图也能直接识别。</p>
+        <div class="viz" aria-hidden="true"><div class="qrbox"><canvas id="v-qr" width="25" height="25"></canvas><span id="v-qr-t">https://github.com/henrry228</span></div></div>
+      </article>
+
+      <article class="b rv">
+        <div class="b-top"><span class="kc">4</span><h3>随机字符</h3><span class="ms" aria-hidden="true">casino</span></div>
         <p>六种字符组合，默认 12 位，可排除易混字符，也能生成 UUID。</p>
         <div class="viz" aria-hidden="true"><span class="lbl" id="v-rnd-l">全混合 · 12 位</span><span class="big" id="v-rnd">k7Rm2xPq9LwT</span></div>
       </article>
-      <article class="b rv" style="--d:.12s">
-        <div class="b-top"><span class="kc">3</span><h3>时间换算</h3><span class="ms" aria-hidden="true">schedule</span></div>
+      <article class="b rv" style="--d:.06s">
+        <div class="b-top"><span class="kc">5</span><h3>时间换算</h3><span class="ms" aria-hidden="true">schedule</span></div>
         <p>时间戳、常见格式、北京、美东美西与 UTC。选中一串时间戳再呼出，直接换算。</p>
         <div class="viz" aria-hidden="true"><span class="lbl">UNIX 时间戳</span><span class="big" id="v-ts">1792594367</span><span class="lbl" id="v-tz"></span></div>
       </article>
-
-      <article class="b rv">
-        <div class="b-top"><span class="kc">4</span><h3>编码解码</h3><span class="ms" aria-hidden="true">code</span></div>
-        <p>Base64、URL、HTML 实体、Unicode、Hex 与哈希，对剪贴板或选中文字一键处理。</p>
+      <article class="b rv" style="--d:.12s">
+        <div class="b-top"><span class="kc">6</span><h3>编码解码</h3><span class="ms" aria-hidden="true">code</span></div>
+        <p>Base64、URL、HTML 实体、Unicode、Hex 与哈希，还能把几步串成一条处理链。</p>
         <div class="viz" aria-hidden="true"><span class="lbl">一按即得 → <span id="v-enc-l">Base64</span></span><span class="row"><span class="caret" id="v-enc"></span></span></div>
       </article>
-      <article class="b rv" style="--d:.06s">
-        <div class="b-top"><span class="kc">5</span><h3>剪贴历史</h3><span class="ms" aria-hidden="true">content_paste</span></div>
-        <p>最近 500 条，只存本机，永不同步。密码类内容自动隐藏，45 秒后清除。</p>
+      <article class="b rv" style="--d:.18s">
+        <div class="b-top"><span class="kc">7</span><h3>剪贴历史</h3><span class="ms" aria-hidden="true">content_paste</span></div>
+        <p>最近 500 条文字和图片，只存本机。图片双击放大，密码类内容 45 秒后清除。</p>
         <div class="viz clip" aria-hidden="true" id="v-clip"></div>
-      </article>
-      <article class="b wide rv" style="--d:.12s">
-        <div class="b-top"><span class="kc">A</span><h3>截图录屏</h3><span class="ms" aria-hidden="true">screenshot_region</span></div>
-        <p>独立快捷键 <code data-hk="A">Shift+Alt+A</code>。数字键切换标注工具，<code>O</code> 识字、<code>P</code> 贴图、<code>L</code> 长截图、<code>Q</code> 识别二维码，还能测距取色，录屏导出 MP4 或 GIF。</p>
-        <div class="viz shot" aria-hidden="true">
-          <div class="win"><i style="width:40%"></i><i style="width:86%"></i><i style="width:72%"></i><i style="width:64%"></i><i style="width:80%"></i><i style="width:30%"></i></div>
-          <div class="sel"><b>1280 × 720</b></div>
-          <div class="bar"><span class="kc">1</span><span class="kc">2</span><span class="kc">3</span><span class="kc">O</span><span class="kc">P</span><span class="kc">L</span></div>
-        </div>
       </article>
 
       <article class="b rv">
-        <div class="b-top"><span class="kc">6</span><h3>二维码</h3><span class="ms" aria-hidden="true">qr_code_2</span></div>
-        <p>剪贴板里的链接或文字一键变成二维码，手机扫一下就拿走。</p>
-        <div class="viz" aria-hidden="true"><div class="qrbox"><canvas id="v-qr" width="25" height="25"></canvas><span id="v-qr-t">https://github.com/henrry228</span></div></div>
-      </article>
-      <article class="b rv" style="--d:.06s">
-        <div class="b-top"><span class="kc">7</span><h3>网络信息</h3><span class="ms" aria-hidden="true">lan</span></div>
-        <p>本机 IP、公网 IP、地区与运营商，排查网络和代理时不用再开网页。</p>
+        <div class="b-top"><span class="kc">8</span><h3>网络信息</h3><span class="ms" aria-hidden="true">lan</span></div>
+        <p>本机与公网 IP、地区和运营商，还能测常用网站的连通性。</p>
         <div class="viz" aria-hidden="true"><span class="row"><span>公网 IP</span><span>203.0.113.42</span></span><div class="bars" id="v-net"></div></div>
       </article>
-      <article class="b rv" style="--d:.12s">
-        <div class="b-top"><span class="kc">8</span><h3>汇率换算</h3><span class="ms" aria-hidden="true">currency_exchange</span></div>
-        <p>多币种同时换算，任意一行当基准，带计算器键盘和走势图。</p>
+      <article class="b rv" style="--d:.06s">
+        <div class="b-top"><span class="kc">9</span><h3>汇率换算</h3><span class="ms" aria-hidden="true">currency_exchange</span></div>
+        <p>多币种同时换算，任意一行当基准，带计算器键盘和一年走势图。</p>
         <div class="viz" aria-hidden="true"><span class="row"><span>USD</span><span class="caret" id="v-fx">0</span></span><span class="row"><span>CNY</span><span id="v-fx-c">0.00</span></span><span class="lbl">示例汇率</span></div>
+      </article>
+      <article class="b rv" style="--d:.12s">
+        <div class="b-top"><span class="kc">0</span><h3>链上查询</h3><span class="ms" aria-hidden="true">currency_bitcoin</span></div>
+        <p>主流币价格、走势和 Gas 费，地址和交易一键跳到区块浏览器。</p>
+        <div class="viz" aria-hidden="true"><span class="row"><span>BTC / USDT</span><span>示例走势</span></span><svg class="spark" viewBox="0 0 200 48" preserveAspectRatio="none"><path id="v-chain" d=""/></svg></div>
       </article>
       <article class="b rv" style="--d:.18s">
         <div class="b-top"><span class="kc">T</span><h3>文字翻译</h3><span class="ms" aria-hidden="true">translate</span></div>
@@ -398,15 +506,68 @@ footer { padding-block: 64px 48px; color: var(--mist); font-size: 13.5px; }
     </div>
   </section>
 
-  <section class="block wrap" id="privacy" aria-labelledby="pv-title">
+  <section class="block wrap" id="capture" aria-labelledby="cap-title">
     <div class="sec-head rv">
-      <h2 id="pv-title">数据在你手里</h2>
-      <p>不需要账号，没有服务器。同步走你自己的存储。</p>
+      <h2 id="cap-title">截好、修好、发出去</h2>
+      <p>按 <code class="hk" data-hk="A">Shift+Alt+A</code> 截图或录屏。标注、识字、贴图、长截图都在键盘上，截完直接美化，录完直接剪。</p>
     </div>
-    <div class="split rv">
-      <div><h3><span class="ms" aria-hidden="true">lock</span>端到端加密</h3><p>配置和 2FA 密钥合成一个加密文件，XChaCha20-Poly1305 加密，同步密码只在你的设备上。</p></div>
-      <div><h3><span class="ms" aria-hidden="true">sync</span>同步用你自己的盘</h3><p>WebDAV（坚果云、NAS 都行），或者放进 iCloud、OneDrive 文件夹。多台电脑按条目合并。</p></div>
-      <div><h3><span class="ms" aria-hidden="true">visibility_off</span>不打扰屏幕</h3><p>菜单不会出现在录屏和截图里。剪贴历史只留在本机，敏感内容自动清除。</p></div>
+    <div class="cap-grid">
+      <article class="cap rv">
+        <div class="cap-head"><h3>截图美化</h3></div>
+        <p>给截图加背景、圆角、阴影和边距，贴进文档或发到群里直接好看。历史截图还能裁剪、旋转、翻转，设定导出尺寸和边框。</p>
+        <div class="beauty" aria-hidden="true">
+          <div class="b-canvas"><div class="b-shot"><div class="b-bar"><i></i><i></i><i></i></div><div class="b-body"><i style="width:46%"></i><i style="width:88%"></i><i style="width:70%"></i><i style="width:80%"></i><i style="width:38%"></i></div></div></div>
+          <div class="b-ctrl">
+            <div class="b-sw"><span>背景</span><i class="s1"></i><i class="s2"></i><i class="s3"></i><i class="s4"></i></div>
+            <div class="b-sl"><span>圆角</span><b><em class="t-rad"></em></b></div>
+            <div class="b-sl"><span>边距</span><b><em class="t-pad"></em></b></div>
+          </div>
+        </div>
+      </article>
+      <article class="cap rv" style="--d:.08s">
+        <div class="cap-head"><h3>录屏剪辑</h3></div>
+        <p>录屏可选画质和声音，Mac 也能录系统声音。录完直接打开编辑窗口：剪切、裁剪、变速、调整尺寸，导出 MP4 或 GIF，保持原始画质。</p>
+        <div class="tl" aria-hidden="true">
+          <div class="tl-view"><div class="tl-rec"><span></span>REC</div><div class="tl-frame"></div><div class="tl-chips"><span class="kc">1×</span><span class="kc tl-sp">2×</span></div></div>
+          <div class="tl-track"><div class="tl-clip"><i class="h l"></i><i class="h r"></i></div><div class="tl-head"></div></div>
+          <div class="tl-out"><span>00:12.4</span><span class="tl-fmt"><b>MP4</b><b>GIF</b></span></div>
+        </div>
+      </article>
+    </div>
+    <ul class="cap-keys rv" aria-label="截图快捷键">
+      <li><span class="kc">1</span>–<span class="kc">0</span>标注工具</li>
+      <li><span class="kc">L</span>长截图</li>
+      <li><span class="kc">O</span>识别文字</li>
+      <li><span class="kc">P</span>贴在屏幕上</li>
+      <li><span class="kc">Q</span>识别二维码</li>
+      <li><span class="kc">M</span>测距</li>
+      <li><span class="kc">D</span>存到桌面</li>
+      <li><span class="kc">空格</span>移动选区</li>
+    </ul>
+  </section>
+
+  <section class="band" id="privacy" aria-labelledby="pv-title">
+    <div class="wrap band-in">
+      <div class="band-l rv">
+        <span class="band-eyebrow">安全</span>
+        <h2 id="pv-title">密钥只在你的设备上</h2>
+        <p>不需要账号，也没有服务器。数据加密之后才会离开电脑，同步走你自己的网盘。</p>
+        <div class="pw" aria-hidden="true">
+          <div class="pw-label">同步密码</div>
+          <div class="pw-field"><span class="caret" id="pw-t"></span></div>
+          <div class="pw-meter"><i id="pw-bar"></i></div>
+          <div class="pw-msg" id="pw-msg">&nbsp;</div>
+        </div>
+        <p class="band-fine">同步和备份密码至少 10 位，太弱的会被拒绝，也可以一键生成强密码。密码用 Argon2id 派生，每猜一次都要占用 256 MB 内存，批量暴力破解的成本很高。</p>
+      </div>
+      <div class="band-grid rv" style="--d:.08s">
+        <div><span class="ms" aria-hidden="true">lock</span><h3>端到端加密</h3><p>配置、2FA 密钥和备忘合成一个文件，用 XChaCha20-Poly1305 加密，网盘里只有密文。</p></div>
+        <div><span class="ms" aria-hidden="true">cloud_sync</span><h3>用你自己的盘同步</h3><p>WebDAV、iCloud 或 OneDrive 文件夹都行，多台电脑按条目合并。</p></div>
+        <div><span class="ms" aria-hidden="true">fingerprint</span><h3>看密钥要先验证</h3><p>查看或导出 2FA 密钥需要指纹或系统密码。</p></div>
+        <div><span class="ms" aria-hidden="true">enhanced_encryption</span><h3>备忘单独上锁</h3><p>重要备忘用单独的备忘密码加密，和同步密码分开。</p></div>
+        <div><span class="ms" aria-hidden="true">verified_user</span><h3>更新包先验签</h3><p>新版本在后台下载，校验签名通过才安装，被改过的包装不上。</p></div>
+        <div><span class="ms" aria-hidden="true">visibility_off</span><h3>不留痕迹</h3><p>剪贴历史只存本机，密码类内容自动清除；菜单不会出现在截图和录屏里。</p></div>
+      </div>
     </div>
   </section>
 
@@ -416,6 +577,7 @@ footer { padding-block: 64px 48px; color: var(--mist); font-size: 13.5px; }
         <h2 id="dl-title">下载 ZZTools</h2>
         <p class="sub" id="dl-sub">免费使用。安装后在托盘里常驻，按 Shift+Alt+Z 开始。</p>
         <div class="notes">
+          <p class="upd">装一次就好：新版本在后台下载，校验签名后自动安装。默认开机启动，可在设置里关闭。</p>
           <p>macOS 版本同时支持 Apple 芯片和 Intel。</p>
           <p>Windows 便携版解压即用，设置保存在程序旁边。</p>
           <p id="mac-note">如果 macOS 提示“无法验证开发者”，在“系统设置 › 隐私与安全性”里点“仍要打开”。</p>
@@ -483,14 +645,16 @@ footer { padding-block: 64px 48px; color: var(--mist); font-size: 13.5px; }
 
   /* ---- live demo menu ---- */
   var tools = [
-    { k: "1", name: "TOTP", icon: "password", items: function () { return [["GitHub", code(1)], ["Google", code(2)], ["阿里云", code(3)], ["Cloudflare", code(4)]]; } },
-    { k: "2", name: "随机字符", icon: "casino", items: function () { return [["全混合", rand(U + L + D + "!@#$%", 12)], ["大小写混合", rand(U + L, 12)], ["纯数字", rand("0123456789", 12)], ["纯小写", rand(L, 12)], ["UUID", (crypto.randomUUID ? crypto.randomUUID() : rand("0123456789abcdef", 32))]]; } },
-    { k: "3", name: "时间换算", icon: "schedule", items: function () { var d = new Date(); return [["UNIX 时间戳", String(Math.floor(d / 1000))], ["本地时间", d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + " " + pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds())], ["北京时间", fmtTZ("Asia/Shanghai")], ["美东时间", fmtTZ("America/New_York")], ["UTC", d.toISOString().slice(0, 19) + "Z"]]; } },
-    { k: "4", name: "编码解码", icon: "code", items: function () { var s = "一按即得"; return [["Base64", btoa(unescape(encodeURIComponent(s)))], ["URL 编码", encodeURIComponent(s)], ["Unicode", s.split("").map(function (c) { return "\\u" + c.charCodeAt(0).toString(16); }).join("")]]; } },
-    { k: "5", name: "剪贴历史", icon: "content_paste", items: function () { return [["https://github.com/henrry228", "1 分钟前"], ["会议改到周四下午三点", "8 分钟前"], ["SELECT * FROM orders LIMIT 20", "23 分钟前"]]; } },
-    { k: "6", name: "二维码", icon: "qr_code_2", items: function () { return [["剪贴板内容生成二维码", ""], ["识别屏幕上的二维码", ""]]; } },
-    { k: "7", name: "网络信息", icon: "lan", items: function () { return [["本机 IP", "192.168.1.23"], ["公网 IP", "203.0.113.42"], ["地区", "上海 · 示例"]]; } },
-    { k: "8", name: "汇率换算", icon: "currency_exchange", items: function () { return [["美元 USD → 人民币", "实时汇率"], ["欧元 EUR → 人民币", "实时汇率"], ["打开换算窗口", os === "mac" ? "⌘O" : "Ctrl+O"]]; } }
+    { k: "1", name: "备忘录", icon: "sticky_note_2", label: true, items: function () { return [["周四发版清单", "已加密"], ["给爸妈订回家的票", "明天 09:00"], ["Wi-Fi 与路由器密码", "已加密"]]; } },
+    { k: "2", name: "TOTP", icon: "password", items: function () { return [["GitHub", code(1)], ["Google", code(2)], ["阿里云", code(3)], ["Cloudflare", code(4)]]; } },
+    { k: "3", name: "二维码", icon: "qr_code_2", label: true, items: function () { return [["剪贴板内容生成二维码", ""], ["识别屏幕上的二维码", ""]]; } },
+    { k: "4", name: "随机字符", icon: "casino", items: function () { return [["全混合", rand(U + L + D + "!@#$%", 12)], ["大小写混合", rand(U + L, 12)], ["纯数字", rand("0123456789", 12)], ["纯小写", rand(L, 12)], ["UUID", (crypto.randomUUID ? crypto.randomUUID() : rand("0123456789abcdef", 32))]]; } },
+    { k: "5", name: "时间换算", icon: "schedule", items: function () { var d = new Date(); return [["UNIX 时间戳", String(Math.floor(d / 1000))], ["本地时间", d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + " " + pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds())], ["北京时间", fmtTZ("Asia/Shanghai")], ["美东时间", fmtTZ("America/New_York")], ["UTC", d.toISOString().slice(0, 19) + "Z"]]; } },
+    { k: "6", name: "编码解码", icon: "code", items: function () { var s = "一按即得"; return [["Base64", btoa(unescape(encodeURIComponent(s)))], ["URL 编码", encodeURIComponent(s)], ["Unicode", s.split("").map(function (c) { return "\\u" + c.charCodeAt(0).toString(16); }).join("")]]; } },
+    { k: "7", name: "剪贴历史", icon: "content_paste", label: true, items: function () { return [["https://github.com/henrry228", "1 分钟前"], ["会议改到周四下午三点", "8 分钟前"], ["SELECT * FROM orders LIMIT 20", "23 分钟前"]]; } },
+    { k: "8", name: "网络信息", icon: "lan", items: function () { return [["本机 IP", "192.168.1.23"], ["公网 IP", "203.0.113.42"], ["地区", "上海 · 示例"]]; } },
+    { k: "9", name: "汇率换算", icon: "currency_exchange", items: function () { return [["美元 USD → 人民币", "实时汇率"], ["欧元 EUR → 人民币", "实时汇率"], ["打开换算窗口", os === "mac" ? "⌘O" : "Ctrl+O"]]; } },
+    { k: "0", name: "链上查询", icon: "currency_bitcoin", label: true, items: function () { return [["BTC / USDT", "实时价格"], ["ETH / USDT", "实时价格"], ["ETH Gas 费", "实时费用"]]; } }
   ];
   var L2 = ["Q", "W", "E", "R", "T"];
   var rows = $("rows"), crumb = $("crumb"), foot = $("foot"), toast = $("toast");
@@ -501,7 +665,7 @@ footer { padding-block: 64px 48px; color: var(--mist); font-size: 13.5px; }
     if (cur === null) {
       crumb.textContent = "ZZTools";
       tools.forEach(function (t, i) { html += "<li" + d(i) + '><button type="button" data-i="' + i + '" class="' + (i === sel ? "on" : "") + '">' + kc(t.k) + '<span class="lab">' + t.name + '</span><span class="ms" aria-hidden="true">' + t.icon + "</span></button></li>"; });
-      foot.innerHTML = "<span>" + kc("1") + "–" + kc("8") + " 选择工具</span><span>" + kc("Tab") + " 移动</span><span>" + kc("Esc") + " 关闭</span>";
+      foot.innerHTML = "<span>" + kc("1") + "–" + kc("0") + " 选择工具</span><span>" + kc("Tab") + " 移动</span><span>" + kc("Esc") + " 关闭</span>";
     } else {
       var t = tools[cur]; crumb.textContent = "ZZTools › " + t.name;
       t._cache = t.items();
@@ -514,7 +678,7 @@ footer { padding-block: 64px 48px; color: var(--mist); font-size: 13.5px; }
   function hitRow(attr, idx) { var b = rows.querySelector("[" + attr + '="' + idx + '"] .kc'); if (b) { b.classList.remove("hit"); void b.offsetWidth; b.classList.add("hit"); } }
   function pick(j, quiet) {
     var t = tools[cur], r = t._cache[j]; if (!r) return;
-    var v = r[1] && cur !== 4 ? r[1] : r[0];
+    var v = r[1] && !t.label ? r[1] : r[0];
     sel = j; animRows = false; render(); hitRow("data-j", j);
     var done = function () { clearTimeout(toastT); toast.textContent = "已复制 " + (v.length > 28 ? v.slice(0, 28) + "…" : v); toastT = setTimeout(function () { toast.textContent = ""; }, 2200); };
     if (quiet) { done(); return; }
@@ -526,7 +690,7 @@ footer { padding-block: 64px 48px; color: var(--mist); font-size: 13.5px; }
 
   /* autoplay until the visitor touches the menu or the keyboard */
   var auto = !calm, step = 0, autoT;
-  var script = [[0, 0], [2, 0], [1, 0], [3, 0], [7, 2], [4, 1]];
+  var script = [[1, 0], [0, 1], [3, 0], [4, 0], [5, 0], [6, 1]];
   function stopAuto() { if (!auto) return; auto = false; clearTimeout(autoT);  }
   function tick() {
     if (!auto) return;
@@ -551,7 +715,7 @@ footer { padding-block: 64px 48px; color: var(--mist); font-size: 13.5px; }
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     var tag = (e.target.tagName || "").toLowerCase(); if (tag === "input" || tag === "textarea") return;
     var k = e.key;
-    if (cur === null && /^[1-8]$/.test(k)) { stopAuto(); open(+k - 1); e.preventDefault(); return; }
+    if (cur === null && /^[0-9]$/.test(k)) { stopAuto(); open(k === "0" ? 9 : +k - 1); e.preventDefault(); return; }
     if (cur !== null) {
       var j = L2.indexOf(k.toUpperCase());
       if (j >= 0 && j < tools[cur]._cache.length) { stopAuto(); pick(j); e.preventDefault(); return; }
@@ -559,7 +723,7 @@ footer { padding-block: 64px 48px; color: var(--mist); font-size: 13.5px; }
     }
     if (k === "Tab" && document.activeElement === document.body) { stopAuto(); move(e.shiftKey ? -1 : 1); e.preventDefault(); }
   });
-  setInterval(function () { if (cur === 0 || cur === 2) { animRows = false; render(); } }, 1000);
+  setInterval(function () { if (cur === 1 || cur === 4) { animRows = false; render(); } }, 1000);
 
   /* ---- sticky header border ---- */
   var top = $("top");
@@ -585,7 +749,7 @@ footer { padding-block: 64px 48px; color: var(--mist); font-size: 13.5px; }
   }
 
   /* ---- bento live visuals ---- */
-  var otpBox = $("v-otp"), names = ["GitHub", "Google", "阿里云"], last = [];
+  var otpBox = $("v-otp"), names = ["GitHub", "Google"], last = [];
   var C = 2 * Math.PI * 9;
   otpBox.innerHTML = names.map(function (n, i) { return '<div class="otp-row"><span class="n">' + n + '</span><span class="c" id="otp' + i + '"></span><svg class="ring" viewBox="0 0 22 22"><circle class="bg" cx="11" cy="11" r="9"/><circle class="fg" cx="11" cy="11" r="9" stroke-dasharray="' + C.toFixed(2) + '"/></svg></div>'; }).join("");
   function otpTick() {
@@ -653,6 +817,31 @@ footer { padding-block: 64px 48px; color: var(--mist); font-size: 13.5px; }
     (function f() { el.textContent = v[0].slice(0, ++n) || "0"; $("v-fx-c").textContent = (parseFloat(v[0].slice(0, n)) * v[1]).toFixed(2); if (n < v[0].length) setTimeout(f, calm ? 0 : 160); })();
   }
   fxTick(); setInterval(fxTick, 2800);
+
+
+  typer($("v-memo"), [["", "周五前把官网截图换新"], ["", "下午 3 点和设计对一下图标"], ["", "提醒：续费域名"]], null, 2200);
+
+  var chainPath = $("v-chain");
+  function chainTick() {
+    var y = 24, pts = [];
+    for (var i = 0; i <= 40; i++) { y += (Math.random() - 0.47) * 6; y = Math.max(6, Math.min(42, y)); pts.push((i * 5) + "," + y.toFixed(1)); }
+    chainPath.setAttribute("d", "M" + pts.join(" L"));
+    chainPath.style.strokeDasharray = "400";
+    if (!calm) { chainPath.classList.remove("draw"); void chainPath.getBoundingClientRect(); chainPath.classList.add("draw"); }
+  }
+  chainTick(); setInterval(chainTick, 3600);
+
+  var pwSteps = [["123456", 10, "bad", "太弱，已拒绝"], ["zztools2026", 46, "", "还不够强，再长一点或换成短语"], ["*", 100, "ok", "已生成强密码 · Argon2id 256 MB"]], pi = 0;
+  function pwTick() {
+    var st = pwSteps[pi++ % pwSteps.length], el = $("pw-t"), bar = $("pw-bar"), msg = $("pw-msg");
+    msg.className = "pw-msg"; msg.innerHTML = "&nbsp;"; bar.style.width = "0";
+    var done = function () { bar.style.width = st[1] + "%"; bar.style.background = st[2] === "bad" ? "#F08672" : st[2] === "ok" ? "var(--band-accent)" : "var(--band-mist)"; msg.className = "pw-msg " + st[2]; msg.textContent = st[3]; };
+    if (st[0] === "*") { scramble(el, rand(U + L + D + "#@%-", 18), 800); setTimeout(done, calm ? 0 : 820); return; }
+    var n = 0;
+    if (calm) { el.textContent = st[0]; done(); return; }
+    (function f() { el.textContent = st[0].slice(0, n++); if (n <= st[0].length) setTimeout(f, 80); else setTimeout(done, 200); })();
+  }
+  pwTick(); setInterval(pwTick, 3400);
 
   /* ---- downloads: latest release assets ---- */
   var label = { win: "下载 Windows 版", mac: "下载 macOS 版" };
